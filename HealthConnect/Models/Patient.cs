@@ -9,8 +9,9 @@ namespace HealthConnect.Models
         public Guid UserId { get; set; }
         public Guid? DoctorId { get; set; } // Foreign key to Doctor, now nullable
 
-        public string MedicalHistory { get; set; }
-        public string BloodGroup { get; set; }
+        public string? ProfileImage { get; set; }
+        public string? Address { get; set; }
+        public string? BloodGroup { get; set; }
 
         // Navigation properties
         public User User { get; set; }

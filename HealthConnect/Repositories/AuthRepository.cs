@@ -47,8 +47,8 @@ namespace HealthConnect.Repositories
                 var patient = new Patient
                 {
                     UserId = user.Id,
-                    MedicalHistory = string.Empty,
                     BloodGroup = string.Empty,
+                    ProfileImage = string.Empty,
                     DoctorId = null // Now nullable
                 };
                 _context.Patients.Add(patient);

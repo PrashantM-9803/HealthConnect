@@ -202,15 +202,16 @@ namespace HealthConnect.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BloodGroup")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("DoctorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MedicalHistory")
-                        .IsRequired()
+                    b.Property<string>("ProfileImage")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
