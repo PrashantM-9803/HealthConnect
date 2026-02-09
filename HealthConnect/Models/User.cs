@@ -6,8 +6,8 @@ namespace HealthConnect.Models
     public class User : IdentityUser<Guid>
     {
         // Custom properties
-        public string Name { get; set; }                     
-        public string PhoneNumber { get; set; }                    
+        public string Name { get; set; }                     // Required for signup
+        public string PhoneNumber { get; set; }                     // Required for signup
         public DateTime? Dob { get; set; }                     // Optional
 
         // Optional (for JWT)
