@@ -40,6 +40,35 @@ namespace HealthConnect.Repositories
                 return null;
 
             await _userManager.AddToRoleAsync(user, signupDto.Role);
+
+            // Automatically create Patient record if role is PATIENT
+            if (signupDto.Role == "PATIENT")
+            {
+                var patient = new Patient
+                {
+                    UserId = user.Id,
+                    MedicalHistory = string.Empty,
+                    BloodGroup = string.Empty,
+                    DoctorId = null // Now nullable
+                };
+                _context.Patients.Add(patient);
+                await _context.SaveChangesAsync();
+            }
+
+            // Automatically create Doctor record if role is DOCTOR
+            if (signupDto.Role == "DOCTOR")
+            {
+                var doctor = new Doctor
+                {
+                    UserId = user.Id,
+                    Specialization = string.Empty,
+                    YearsOfExperience = 0,
+                    Bio = string.Empty
+                };
+                _context.Doctors.Add(doctor);
+                await _context.SaveChangesAsync();
+            }
+
             return user;
         }
 

@@ -50,6 +50,8 @@ builder.Services.AddAuthentication(options =>
 // Register TokenRepository
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
 // Add CORS
 builder.Services.AddCors(options =>

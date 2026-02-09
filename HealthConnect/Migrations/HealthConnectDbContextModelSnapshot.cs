@@ -206,7 +206,7 @@ namespace HealthConnect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DoctorId")
+                    b.Property<Guid?>("DoctorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MedicalHistory")
@@ -564,8 +564,7 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Doctor", "Doctor")
                         .WithMany("Patients")
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HealthConnect.Models.User", "User")
                         .WithOne("Patient")

@@ -17,17 +17,26 @@ namespace HealthConnect.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ITokenRepository _tokenRepository;
         private readonly IMapper _mapper;
+        private readonly IPatientRepository _patientRepository;
+        private readonly IDoctorRepository _doctorRepository;
 
-        public AuthController(IAuthRepository authRepository, UserManager<User> userManager, ITokenRepository tokenRepository, IMapper mapper)
+        public AuthController(
+            IAuthRepository authRepository,
+            UserManager<User> userManager,
+            ITokenRepository tokenRepository,
+            IMapper mapper,
+            IPatientRepository patientRepository,
+            IDoctorRepository doctorRepository)
         {
             _authRepository = authRepository;
             _userManager = userManager;
             _tokenRepository = tokenRepository;
             _mapper = mapper;
+            _patientRepository = patientRepository;
+            _doctorRepository = doctorRepository;
         }
 
         [HttpPost("signup")]
-        //[Authorize(Roles="PATIENT, DOCTOR")]
         public async Task<IActionResult> Signup([FromBody] SignupRequestDto signupDto)
         {
             var user = await _authRepository.RegisterAsync(signupDto);
@@ -35,12 +44,22 @@ namespace HealthConnect.Controllers
                 return BadRequest("User registration failed.");
             var userDto = _mapper.Map<LoginResponseDto>(user);
             userDto.Role = signupDto.Role;
-            return Ok(userDto); // user.Id is Guid
+
+            // Set PatientId/DoctorId if available
+            if (signupDto.Role == "PATIENT")
+            {
+                var patient = await _patientRepository.GetPatientByUserIdAsync(user.Id);
+                userDto.PatientId = patient?.Id;
+            }
+            else if (signupDto.Role == "DOCTOR")
+            {
+                var doctor = await _doctorRepository.GetDoctorByUserIdAsync(user.Id);
+                userDto.DoctorId = doctor?.Id;
+            }
+            return Ok(userDto);
         }
 
-
         [HttpPost("login")]
-        //[Authorize(Roles = "PATIENT, DOCTOR, ADMIN")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
         {
             var user = await _authRepository.LoginAsync(loginDto);
@@ -48,8 +67,6 @@ namespace HealthConnect.Controllers
                 return Unauthorized("Invalid credentials.");
 
             var roles = await _userManager.GetRolesAsync(user);
-
-            // Check if provided role matches any of the user's roles
             if (!roles.Contains(loginDto.Role))
                 return Unauthorized("Role mismatch.");
 
@@ -57,17 +74,27 @@ namespace HealthConnect.Controllers
             var refreshToken = _tokenRepository.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
             await _userManager.UpdateAsync(user);
+
             var responseDto = _mapper.Map<LoginResponseDto>(user);
+
             responseDto.Role = roles.FirstOrDefault();
             responseDto.Token = token;
             responseDto.RefreshToken = refreshToken;
             responseDto.ExpiresAt = DateTime.UtcNow.AddHours(1);
+
+            // Set PatientId/DoctorId if available
+            var patient = await _patientRepository.GetPatientByUserIdAsync(user.Id);
+            if (patient != null)
+                responseDto.PatientId = patient.Id;
+            var doctor = await _doctorRepository.GetDoctorByUserIdAsync(user.Id);
+            if (doctor != null)
+                responseDto.DoctorId = doctor.Id;
             return Ok(responseDto);
         }
 
         [HttpPost("refresh")]
-        //[Authorize(Roles = "PATIENT, DOCTOR, ADMIN")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto refreshDto)
         {
             var (user, valid) = await _authRepository.RefreshTokenAsync(refreshDto.Email, refreshDto.RefreshToken);
@@ -80,10 +107,17 @@ namespace HealthConnect.Controllers
             responseDto.Token = token;
             responseDto.RefreshToken = user.RefreshToken;
             responseDto.ExpiresAt = DateTime.UtcNow.AddHours(1);
+
+            // Set PatientId/DoctorId if available
+            var patient = await _patientRepository.GetPatientByUserIdAsync(user.Id);
+            if (patient != null)
+                responseDto.PatientId = patient.Id;
+            var doctor = await _doctorRepository.GetDoctorByUserIdAsync(user.Id);
+            if (doctor != null)
+                responseDto.DoctorId = doctor.Id;
             return Ok(responseDto);
         }
 
-        // Example of role-based access
         [HttpGet("admin-only")]
         [Authorize(Roles = "ADMIN")]
         [Microsoft.AspNetCore.Authorization.Authorize(Roles = "ADMIN")]
