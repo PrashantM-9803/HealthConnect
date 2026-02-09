@@ -31,10 +31,14 @@ namespace HealthConnect.Models.Dto
     public class DoctorDto
     {
         public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string Specialization { get; set; }
         public int YearsOfExperience { get; set; }
         public int? MemberSince { get; set; }
         public string Bio { get; set; }
+        public UserDto User { get; set; }
+        public List<PatientDto> Patients { get; set; }
+        public List<AppointmentDto> Appointments { get; set; }
     }
 
     public class AppointmentDto

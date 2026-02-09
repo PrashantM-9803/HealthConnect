@@ -7,5 +7,6 @@ namespace HealthConnect.Repositories
     public interface IDoctorRepository
     {
         Task<Doctor?> GetDoctorByUserIdAsync(Guid userId);
+        Task<Doctor?> GetDoctorByIdAsync(Guid id);
     }
 }

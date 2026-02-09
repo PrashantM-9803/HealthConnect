@@ -22,5 +22,14 @@ namespace HealthConnect.Repositories
                 .Include(d => d.Appointments)
                 .FirstOrDefaultAsync(d => d.UserId == userId);
         }
+
+        public async Task<Doctor?> GetDoctorByIdAsync(Guid id)
+        {
+            return await _context.Doctors
+                .Include(d => d.User)
+                .Include(d => d.Patients)
+                .Include(d => d.Appointments)
+                .FirstOrDefaultAsync(d => d.Id == id);
+        }
     }
 }
