@@ -5,6 +5,7 @@ using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace HealthConnect.Controllers
 {
@@ -15,12 +16,14 @@ namespace HealthConnect.Controllers
         private readonly IAuthRepository _authRepository;
         private readonly UserManager<User> _userManager;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository authRepository, UserManager<User> userManager, ITokenRepository tokenRepository)
+        public AuthController(IAuthRepository authRepository, UserManager<User> userManager, ITokenRepository tokenRepository, IMapper mapper)
         {
             _authRepository = authRepository;
             _userManager = userManager;
             _tokenRepository = tokenRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("signup")]
@@ -30,7 +33,9 @@ namespace HealthConnect.Controllers
             var user = await _authRepository.RegisterAsync(signupDto);
             if (user == null)
                 return BadRequest("User registration failed.");
-            return Ok(new { user.Id, user.Email, user.Name, user.PhoneNumber }); // user.Id is Guid
+            var userDto = _mapper.Map<LoginResponseDto>(user);
+            userDto.Role = signupDto.Role;
+            return Ok(userDto); // user.Id is Guid
         }
 
 
@@ -53,16 +58,12 @@ namespace HealthConnect.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(user);
-            return Ok(new LoginResponseDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                Role = roles.FirstOrDefault(),
-                Token = token,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddHours(1)
-            });
+            var responseDto = _mapper.Map<LoginResponseDto>(user);
+            responseDto.Role = roles.FirstOrDefault();
+            responseDto.Token = token;
+            responseDto.RefreshToken = refreshToken;
+            responseDto.ExpiresAt = DateTime.UtcNow.AddHours(1);
+            return Ok(responseDto);
         }
 
         [HttpPost("refresh")]
@@ -74,16 +75,12 @@ namespace HealthConnect.Controllers
                 return Unauthorized("Invalid or expired refresh token.");
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenRepository.GenerateJwtToken(user, roles);
-            return Ok(new LoginResponseDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                Role = roles.FirstOrDefault(),
-                Token = token,
-                RefreshToken = user.RefreshToken,
-                ExpiresAt = DateTime.UtcNow.AddHours(1)
-            });
+            var responseDto = _mapper.Map<LoginResponseDto>(user);
+            responseDto.Role = roles.FirstOrDefault();
+            responseDto.Token = token;
+            responseDto.RefreshToken = user.RefreshToken;
+            responseDto.ExpiresAt = DateTime.UtcNow.AddHours(1);
+            return Ok(responseDto);
         }
 
         // Example of role-based access

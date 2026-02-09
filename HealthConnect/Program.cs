@@ -1,3 +1,4 @@
+using AutoMapper;
 using HealthConnect.Data;
 using HealthConnect.Models;
 using HealthConnect.Repositories;
@@ -64,6 +65,9 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register AutoMapper and scan for profiles
+builder.Services.AddAutoMapper(typeof(HealthConnect.Mapping.AuthProfile).Assembly);
 
 var app = builder.Build();
 
