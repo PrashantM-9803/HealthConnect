@@ -9,5 +9,6 @@ namespace HealthConnect.Repositories
         Task<User> RegisterAsync(SignupRequestDto signupDto);
         Task<User> LoginAsync(LoginRequestDto loginDto);
         Task<User> GetByEmailAsync(string email);
+        Task<(User user, bool valid)> RefreshTokenAsync(string email, string refreshToken);
     }
 }

@@ -4,6 +4,7 @@ namespace HealthConnect.Models.Dto
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        public string Role { get; set; } // New: Role input for login
     }
 
     public class SignupRequestDto
@@ -12,6 +13,8 @@ namespace HealthConnect.Models.Dto
         public string Password { get; set; } // Required
         public string Name { get; set; } // Required
         public string Role { get; set; } // Required
+        public string PhoneNumber { get; set; } // Required
+        public DateTime? Dob { get; set; } // Optional
     }
 
     public class LoginResponseDto

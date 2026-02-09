@@ -26,18 +26,19 @@ namespace HealthConnect.Repositories
             {
                 UserName = signupDto.Email,
                 Email = signupDto.Email,
-                Name = signupDto.Name
+                Name = signupDto.Name,
+                PhoneNumber = signupDto.PhoneNumber,
+                Dob = signupDto.Dob
             };
+
+            // Only assign if role exists
+            if (!await _roleManager.RoleExistsAsync(signupDto.Role))
+                return null;
+
             var result = await _userManager.CreateAsync(user, signupDto.Password);
             if (!result.Succeeded)
                 return null;
 
-            // Only assign if role exists
-            if (!await _roleManager.RoleExistsAsync(signupDto.Role))
-            {
-                // Role does not exist, return null or throw an exception as per your error handling strategy
-                return null;
-            }
             await _userManager.AddToRoleAsync(user, signupDto.Role);
             return user;
         }
@@ -54,6 +55,18 @@ namespace HealthConnect.Repositories
         public async Task<User> GetByEmailAsync(string email)
         {
             return await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+        
+        public async Task<(User user, bool valid)> RefreshTokenAsync(string email, string refreshToken)
+        {
+            var user = await GetByEmailAsync(email);
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                return (null, false);
+            // Generate new refresh token and update expiry
+            user.RefreshToken = Guid.NewGuid().ToString();
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _userManager.UpdateAsync(user);
+            return (user, true);
         }
     }
 }
