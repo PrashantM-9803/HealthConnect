@@ -18,6 +18,14 @@ namespace HealthConnect.Mapping
             CreateMap<Medications, MedicationsDto>().ReverseMap();
             CreateMap<Invoice, InvoiceDto>().ReverseMap();
             CreateMap<Diagnosis, DiagnosisDto>().ReverseMap();
+
+            // Map Patient + User to PatientUpdateProfileDto (for GET)
+            CreateMap<Patient, PatientUpdateProfileDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.User.Dob))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
         }
     }
 }

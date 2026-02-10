@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using HealthConnect.Models;
+using HealthConnect.Models.Dto;
 
 namespace HealthConnect.Repositories
 {
@@ -8,5 +9,6 @@ namespace HealthConnect.Repositories
     {
         Task<Patient?> GetPatientByIdAsync(Guid id);
         Task<Patient?> GetPatientByUserIdAsync(Guid userId);
+        Task<bool> UpdatePatientProfileAsync(Guid userId, PatientUpdateProfileDto updateDto);
     }
 }

@@ -46,5 +46,26 @@ namespace HealthConnect.Repositories
                 .Include(p => p.Diagnoses)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
+
+        public async Task<bool> UpdatePatientProfileAsync(Guid userId, Models.Dto.PatientUpdateProfileDto updateDto)
+        {
+            var patient = await _context.Patients
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if (patient == null)
+                return false;
+
+            // Update User fields (do NOT update Email)
+            patient.User.Name = updateDto.FullName;
+            patient.User.PhoneNumber = updateDto.Phone;
+            patient.User.Dob = updateDto.Dob;
+
+            // Update Patient fields
+            patient.Address = updateDto.Address;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

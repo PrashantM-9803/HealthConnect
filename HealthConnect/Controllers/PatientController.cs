@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HealthConnect.Models.Dto;
 using HealthConnect.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 
@@ -24,6 +25,7 @@ namespace HealthConnect.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
         public async Task<IActionResult> GetPatientById(Guid id, [FromQuery] bool isUserId = false)
         {
             if (isUserId)
@@ -46,5 +48,26 @@ namespace HealthConnect.Controllers
                 return Ok(patientDto);
             }
         }
+
+        [HttpPut("update-profile/{userId}")]
+        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
+        public async Task<IActionResult> UpdateProfile(Guid userId, [FromBody] PatientUpdateProfileDto updateDto)
+        {
+            var result = await _patientRepository.UpdatePatientProfileAsync(userId, updateDto);
+            if (!result)
+                return NotFound(new { message = "Patient not found." });
+
+            var updatedPatient = await _patientRepository.GetPatientByUserIdAsync(userId);
+            if (updatedPatient == null)
+                return NotFound(new { message = "Patient not found after update." });
+
+            var patientDto = _mapper.Map<PatientDto>(updatedPatient);
+            return Ok(patientDto);
+        }
+        
+
+
+
     }
 }
+
