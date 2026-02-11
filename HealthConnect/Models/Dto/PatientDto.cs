@@ -11,11 +11,12 @@ namespace HealthConnect.Models.Dto
         public string BloodGroup { get; set; }
         public UserDto User { get; set; }
         public DoctorDto Doctor { get; set; }
+        public List<AppointmentDto> Appointments { get; set; }
         public List<VitalsDto> Vitals { get; set; }
         public List<MedicationsDto> Medications { get; set; }
         public List<InvoiceDto> Invoices { get; set; }
         public List<DiagnosisDto> Diagnoses { get; set; }
-    }
+    }   
 
     public class VitalsDto
     {

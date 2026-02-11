@@ -111,22 +111,26 @@ namespace HealthConnect.Controllers
         }
 
         // Get all vitals for a patient
-        [HttpGet("{patientId}/vitals")]
-        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
-        public async Task<IActionResult> GetVitalsByPatientId(Guid patientId)
-        {
+        //[HttpGet("{patientId}/vitals")]
+        //[Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
+        //public async Task<IActionResult> GetVitalsByPatientId(Guid patientId)
+        //{
 
-            var patient = await _patientRepository.GetPatientByIdAsync(patientId);
-            if (patient == null)
-                return NotFound(new { message = "Patient not found." });
+        //    var patient = await _patientRepository.GetPatientByIdAsync(patientId);
+        //    if (patient == null)
+        //        return NotFound(new { message = "Patient not found." });
 
-            var vitals = patient.Vitals;
-            if (vitals == null || vitals.Count == 0)
-                return NotFound(new { message = "No vitals found for this patient." });
+        //    var vitals = patient.Vitals;
+        //    if (vitals == null || vitals.Count == 0)
+        //        return NotFound(new { message = "No vitals found for this patient." });
 
-            var vitalsDto = _mapper.Map<IEnumerable<HealthConnect.Models.Dto.VitalsDto>>(vitals);
-            return Ok(vitalsDto);
-        }
+        //    var vitalsDto = _mapper.Map<IEnumerable<HealthConnect.Models.Dto.VitalsDto>>(vitals);
+        //    return Ok(vitalsDto);
+        //}
+
+
+
+
     }
 }
 
