@@ -17,6 +17,19 @@ namespace HealthConnect.Repositories
             _userManager = userManager;
         }
 
+        public async Task<List<Patient>> GetAllPatientsAsync()
+        {
+            return await _context.Patients
+                .Include(p => p.User)
+                .Include(p => p.Doctor)
+                .Include(p => p.Appointments)
+                .Include(p => p.Vitals)
+                .Include(p => p.Medications)
+                .Include(p => p.Invoices)
+                .Include(p => p.Diagnoses)
+                .ToListAsync();
+        }
+
         public async Task<Patient?> GetPatientByIdAsync(Guid id)
         {
             return await _context.Patients
