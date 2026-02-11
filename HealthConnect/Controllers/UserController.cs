@@ -47,16 +47,19 @@ namespace HealthConnect.Controllers
         }
 
         /// <summary>
-        /// Unified endpoint to delete profile image for both Patient and Doctor.
-        /// Usage: /api/User/delete-profile-image/{userId}?userType=PATIENT or DOCTOR
+        /// Delete profile image for the authenticated Patient or Doctor.
         /// </summary>
-        [HttpDelete("delete-profile-image/{userId}")]
-        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
-        public async Task<IActionResult> DeleteProfileImage(Guid userId, [FromQuery] string userType)
+        [HttpDelete("delete-profile-image")]
+        [Authorize(Roles = "PATIENT,DOCTOR")]
+        public async Task<IActionResult> DeleteProfileImage()
         {
             try
             {
-                if (userType.Equals("PATIENT", StringComparison.OrdinalIgnoreCase))
+                var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdStr, out var userId))
+                    return Unauthorized();
+
+                if (User.IsInRole("PATIENT"))
                 {
                     var patient = await _patientRepository.GetPatientByUserIdAsync(userId);
                     if (patient == null)
@@ -70,7 +73,7 @@ namespace HealthConnect.Controllers
 
                     return Ok(new { message = "Profile image deleted successfully." });
                 }
-                else if (userType.Equals("DOCTOR", StringComparison.OrdinalIgnoreCase))
+                else if (User.IsInRole("DOCTOR"))
                 {
                     var doctor = await _doctorRepository.GetDoctorByUserIdAsync(userId);
                     if (doctor == null)
@@ -86,7 +89,7 @@ namespace HealthConnect.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { message = "Invalid userType. Must be 'PATIENT' or 'DOCTOR'." });
+                    return Forbid();
                 }
             }
             catch (Exception)
@@ -96,19 +99,22 @@ namespace HealthConnect.Controllers
         }
 
         /// <summary>
-        /// Unified endpoint to update profile image for both Patient and Doctor.
-        /// Usage: /api/User/update-profile-image/{userId}?userType=PATIENT or DOCTOR
+        /// Update profile image for the authenticated Patient or Doctor.
         /// </summary>
-        [HttpPost("update-profile-image/{userId}")]
-        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
-        public async Task<IActionResult> UpdateProfileImage(Guid userId, [FromForm] ImageUploadDto imageUploadDto, [FromQuery] string userType)
+        [HttpPost("update-profile-image")]
+        [Authorize(Roles = "PATIENT,DOCTOR")]
+        public async Task<IActionResult> UpdateProfileImage([FromForm] ImageUploadDto imageUploadDto)
         {
             if (!_imageRepository.ValidateImage(imageUploadDto.File))
                 return BadRequest(new { message = "Invalid image file. Allowed formats: jpg, jpeg, png, gif, bmp. Max size: 5MB." });
 
             try
             {
-                if (userType.Equals("PATIENT", StringComparison.OrdinalIgnoreCase))
+                var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdStr, out var userId))
+                    return Unauthorized();
+
+                if (User.IsInRole("PATIENT"))
                 {
                     var patient = await _patientRepository.GetPatientByUserIdAsync(userId);
                     if (patient == null)
@@ -136,7 +142,7 @@ namespace HealthConnect.Controllers
                         }
                     });
                 }
-                else if (userType.Equals("DOCTOR", StringComparison.OrdinalIgnoreCase))
+                else if (User.IsInRole("DOCTOR"))
                 {
                     var doctor = await _doctorRepository.GetDoctorByUserIdAsync(userId);
                     if (doctor == null)
@@ -166,7 +172,7 @@ namespace HealthConnect.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { message = "Invalid userType. Must be 'PATIENT' or 'DOCTOR'." });
+                    return Forbid();
                 }
             }
             catch (ArgumentException ex)
