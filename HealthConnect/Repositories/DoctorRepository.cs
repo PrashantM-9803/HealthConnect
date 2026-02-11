@@ -31,5 +31,18 @@ namespace HealthConnect.Repositories
                 .Include(d => d.Appointments)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
+
+        public async Task<bool> UpdateDoctorProfileImageAsync(Guid userId, string profileImagePath)
+        {
+            var doctor = await _context.Doctors
+                .FirstOrDefaultAsync(d => d.UserId == userId);
+
+            if (doctor == null)
+                return false;
+
+            doctor.ProfileImage = profileImagePath;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

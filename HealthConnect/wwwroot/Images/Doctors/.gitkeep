@@ -1,0 +1,2 @@
+# This folder stores doctor profile images
+# Images are served as static files via https://localhost:port/Images/Doctors/filename.jpg

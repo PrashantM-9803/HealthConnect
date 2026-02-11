@@ -16,6 +16,9 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<HealthConnectDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HealthConnectConnectionString")));
 
+// Register IHttpContextAccessor for accessing HTTP context
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     {
         options.Password.RequireDigit = true;
@@ -85,6 +88,7 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -115,6 +119,9 @@ if (app.Environment.IsDevelopment())
 
 // Use CORS - MUST be before UseHttpsRedirection, UseAuthentication, and UseAuthorization
 app.UseCors("AllowAngularApp");
+
+// Enable serving static files from wwwroot folder
+app.UseStaticFiles();
 
 // Disable HTTPS redirection in development to avoid CORS issues
 if (!app.Environment.IsDevelopment())

@@ -67,5 +67,18 @@ namespace HealthConnect.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> UpdatePatientProfileImageAsync(Guid userId, string profileImagePath)
+        {
+            var patient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            if (patient == null)
+                return false;
+
+            patient.ProfileImage = profileImagePath;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
