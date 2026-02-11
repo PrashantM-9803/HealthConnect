@@ -50,7 +50,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Appointment");
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Diagnosis", b =>

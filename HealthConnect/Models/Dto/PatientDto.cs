@@ -11,11 +11,21 @@ namespace HealthConnect.Models.Dto
         public string BloodGroup { get; set; }
         public UserDto User { get; set; }
         public DoctorDto Doctor { get; set; }
-        public List<AppointmentDto> Appointments { get; set; }
         public List<VitalsDto> Vitals { get; set; }
         public List<MedicationsDto> Medications { get; set; }
         public List<InvoiceDto> Invoices { get; set; }
         public List<DiagnosisDto> Diagnoses { get; set; }
+    }
+
+    public class VitalsDto
+    {
+        public Guid Id { get; set; }
+        public Guid AppointmentId { get; set; }
+        public Guid PatientId { get; set; }
+        public string? BloodPressure { get; set; }
+        public int HeartRate { get; set; }
+        public float Temperature { get; set; }
+        public int SpO2 { get; set; }
     }
 
     public class UserDto
@@ -50,16 +60,6 @@ namespace HealthConnect.Models.Dto
         public string Reason { get; set; }
     }
 
-    public class VitalsDto
-    {
-        public Guid Id { get; set; }
-        public Guid AppointmentId { get; set; }
-        public Guid PatientId { get; set; }
-        public string BloodPressure { get; set; }
-        public int HeartRate { get; set; }
-        public float Temperature { get; set; }
-        public int SpO2 { get; set; }
-    }
 
     public class MedicationsDto
     {
