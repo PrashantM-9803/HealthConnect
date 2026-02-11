@@ -6,6 +6,7 @@ using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace HealthConnect.Controllers
 {
@@ -17,13 +18,20 @@ namespace HealthConnect.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<HealthConnect.Models.User> _userManager;
         private readonly IImageRepository _imageRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
 
-        public DoctorController(IDoctorRepository doctorRepository, IMapper mapper, UserManager<HealthConnect.Models.User> userManager, IImageRepository imageRepository)
+        public DoctorController(
+            IDoctorRepository doctorRepository, 
+            IMapper mapper, 
+            UserManager<HealthConnect.Models.User> userManager, 
+            IImageRepository imageRepository,
+            IAppointmentRepository appointmentRepository)
         {
             _doctorRepository = doctorRepository;
             _mapper = mapper;
             _userManager = userManager;
             _imageRepository = imageRepository;
+            _appointmentRepository = appointmentRepository;
         }
 
         [HttpGet("{id}")]
@@ -50,7 +58,28 @@ namespace HealthConnect.Controllers
             }
         }
 
+        // Get all appointments for a doctor
+        [HttpGet("{doctorId}/appointments")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> GetAppointmentsByDoctorId(Guid doctorId)
+        {
+            var doctor = await _doctorRepository.GetDoctorByIdAsync(doctorId);
+            if (doctor == null)
+                return NotFound(new { message = "Doctor not found." });
+
+            var appointments = await _appointmentRepository.GetAppointmentsByDoctorIdAsync(doctorId);
+            var appointmentDtos = _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
+            
+            return Ok(new
+            {
+                doctorId = doctorId,
+                totalAppointments = appointmentDtos.Count(),
+                appointments = appointmentDtos
+            });
+        }
+
         // Update profile image for a doctor
         // Delete profile image for a doctor
     }
 }
+

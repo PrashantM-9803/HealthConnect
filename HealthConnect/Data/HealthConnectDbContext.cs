@@ -15,6 +15,7 @@ namespace HealthConnect.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<DoctorSlot> DoctorSlots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -39,6 +40,20 @@ namespace HealthConnect.Data
                 .HasOne(a => a.Doctor)
                 .WithMany(d => d.Appointments)
                 .HasForeignKey(a => a.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure DoctorSlot relationships
+            builder.Entity<DoctorSlot>()
+                .HasOne(ds => ds.Doctor)
+                .WithMany(d => d.DoctorSlots)
+                .HasForeignKey(ds => ds.DoctorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure Appointment-Slot relationship
+            builder.Entity<Appointment>()
+                .HasOne(a => a.Slot)
+                .WithOne(s => s.Appointment)
+                .HasForeignKey<Appointment>(a => a.SlotId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Prevent cascade delete from Appointment to Diagnosis
