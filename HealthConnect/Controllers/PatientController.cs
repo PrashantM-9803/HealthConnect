@@ -131,92 +131,9 @@ namespace HealthConnect.Controllers
         }
 
         // Update profile image for a patient
-        [HttpPost("update-profile-image/{userId}")]
-        [Authorize(Roles = "PATIENT,ADMIN")]
-        public async Task<IActionResult> UpdateProfileImage(Guid userId, [FromForm] ImageUploadDto imageUploadDto)
-        {
-            // Validate patient exists
-            var patient = await _patientRepository.GetPatientByUserIdAsync(userId);
-            if (patient == null)
-                return NotFound(new { message = "Patient not found." });
-
-            // Validate image file
-            if (!_imageRepository.ValidateImage(imageUploadDto.File))
-                return BadRequest(new { message = "Invalid image file. Allowed formats: jpg, jpeg, png, gif, bmp. Max size: 5MB." });
-
-            try
-            {
-                // Delete old profile image if exists
-                if (!string.IsNullOrWhiteSpace(patient.ProfileImage))
-                {
-                    await _imageRepository.DeleteImageAsync(patient.ProfileImage);
-                }
-
-                // Upload new image
-                var uploadedImage = await _imageRepository.UploadImageAsync(
-                    imageUploadDto.File,
-                    imageUploadDto.FileDescription,
-                    "Patients"
-                );
-
-                // Update patient profile image path
-                var updateResult = await _patientRepository.UpdatePatientProfileImageAsync(userId, uploadedImage.FilePath);
-                if (!updateResult)
-                    return StatusCode(500, new { message = "Failed to update profile image." });
-
-                var response = new ImageUploadResponseDto
-                {
-                    FileName = uploadedImage.FileName,
-                    FilePath = uploadedImage.FilePath,
-                    FileDescription = uploadedImage.FileDescription,
-                    FileExtension = uploadedImage.FileExtension,
-                    FileSizeInBytes = uploadedImage.FileSizeInBytes,
-                    UploadedAt = DateTime.UtcNow
-                };
-
-                return Ok(new
-                {
-                    message = "Profile image updated successfully.",
-                    data = response
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An error occurred while uploading the image." });
-            }
-        }
-
         // Delete profile image for a patient
-        [HttpDelete("delete-profile-image/{userId}")]
-        [Authorize(Roles = "PATIENT,ADMIN")]
-        public async Task<IActionResult> DeleteProfileImage(Guid userId)
-        {
-            var patient = await _patientRepository.GetPatientByUserIdAsync(userId);
-            if (patient == null)
-                return NotFound(new { message = "Patient not found." });
-
-            if (string.IsNullOrWhiteSpace(patient.ProfileImage))
-                return BadRequest(new { message = "No profile image to delete." });
-
-            try
-            {
-                // Delete image file
-                await _imageRepository.DeleteImageAsync(patient.ProfileImage);
-
-                // Update patient profile image to null
-                await _patientRepository.UpdatePatientProfileImageAsync(userId, null);
-
-                return Ok(new { message = "Profile image deleted successfully." });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An error occurred while deleting the image." });
-            }
-        }
+        
+        
     }
 }
 
