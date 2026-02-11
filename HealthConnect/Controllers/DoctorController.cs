@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HealthConnect.Models.Dto;
 using HealthConnect.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,12 +16,14 @@ namespace HealthConnect.Controllers
         private readonly IDoctorRepository _doctorRepository;
         private readonly IMapper _mapper;
         private readonly UserManager<HealthConnect.Models.User> _userManager;
+        private readonly IImageRepository _imageRepository;
 
-        public DoctorController(IDoctorRepository doctorRepository, IMapper mapper, UserManager<HealthConnect.Models.User> userManager)
+        public DoctorController(IDoctorRepository doctorRepository, IMapper mapper, UserManager<HealthConnect.Models.User> userManager, IImageRepository imageRepository)
         {
             _doctorRepository = doctorRepository;
             _mapper = mapper;
             _userManager = userManager;
+            _imageRepository = imageRepository;
         }
 
         [HttpGet("{id}")]
@@ -46,5 +49,8 @@ namespace HealthConnect.Controllers
                 return Ok(doctorDto);
             }
         }
+
+        // Update profile image for a doctor
+        // Delete profile image for a doctor
     }
 }

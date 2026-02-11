@@ -8,5 +8,6 @@ namespace HealthConnect.Repositories
     {
         Task<Doctor?> GetDoctorByUserIdAsync(Guid userId);
         Task<Doctor?> GetDoctorByIdAsync(Guid id);
+        Task<bool> UpdateDoctorProfileImageAsync(Guid userId, string profileImagePath);
     }
 }

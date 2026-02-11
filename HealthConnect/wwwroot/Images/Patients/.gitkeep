@@ -1,0 +1,2 @@
+# This folder stores patient profile images
+# Images are served as static files via https://localhost:port/Images/Patients/filename.jpg

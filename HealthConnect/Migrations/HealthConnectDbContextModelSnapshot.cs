@@ -92,6 +92,9 @@ namespace HealthConnect.Migrations
                     b.Property<int?>("MemberSince")
                         .HasColumnType("int");
 
+                    b.Property<string>("ProfileImage")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

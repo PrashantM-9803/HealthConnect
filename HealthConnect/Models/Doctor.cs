@@ -11,6 +11,7 @@ namespace HealthConnect.Models
         public int YearsOfExperience { get; set; }
         public int? MemberSince { get; set; }
         public string Bio { get; set; }
+        public string? ProfileImage { get; set; }
 
         // Navigation properties
         public User User { get; set; }
