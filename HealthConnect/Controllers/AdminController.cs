@@ -3,6 +3,7 @@
 using AutoMapper;
 using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using HealthConnect.Models.Dto;
 
 namespace HealthConnect.Controllers
 {
@@ -11,11 +12,13 @@ namespace HealthConnect.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IAdminRepository _adminRepository;
         private readonly IMapper _mapper;
 
-        public AdminController(IPatientRepository patientRepository, IMapper mapper)
+        public AdminController(IPatientRepository patientRepository, IAdminRepository adminRepository, IMapper mapper)
         {
             _patientRepository = patientRepository;
+            _adminRepository = adminRepository;
             _mapper = mapper;
         }
 
@@ -38,6 +41,18 @@ namespace HealthConnect.Controllers
             if (!result)
                 return NotFound(new { message = "Patient not found." });
             return NoContent();
+        }
+
+        // PUT: api/admin/users/password/{userId}
+        [HttpPut("users/password/{userId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdateUserPassword([FromBody] UpdatePasswordDto dto, Guid userId)
+        {
+            var result = await _adminRepository.UpdateUserPasswordAsync(userId, dto.NewPassword);
+            if (!result)
+                return NotFound(new { message = "User not found or password update failed." });
+
+            return Ok(new { message = "Password updated successfully." });
         }
 
     }
