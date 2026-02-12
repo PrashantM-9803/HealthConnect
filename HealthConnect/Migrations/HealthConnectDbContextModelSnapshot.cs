@@ -595,7 +595,7 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
                         .WithOne("Invoice")
                         .HasForeignKey("HealthConnect.Models.Invoice", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
@@ -614,7 +614,7 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
                         .WithOne("Medications")
                         .HasForeignKey("HealthConnect.Models.Medications", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
@@ -651,7 +651,7 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
                         .WithOne("Vitals")
                         .HasForeignKey("HealthConnect.Models.Vitals", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")

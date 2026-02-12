@@ -59,7 +59,7 @@ namespace HealthConnect.Controllers
         }
 
         // Get all appointments for a doctor
-        [HttpGet("{doctorId}/appointments")]
+        [HttpGet("appointments/{doctorId}")]
         [Authorize(Roles = "DOCTOR,ADMIN")]
         public async Task<IActionResult> GetAppointmentsByDoctorId(Guid doctorId)
         {
@@ -80,6 +80,34 @@ namespace HealthConnect.Controllers
 
         // Update profile image for a doctor
         // Delete profile image for a doctor
+
+        [HttpPut("update-profile/{userId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> UpdateProfile(Guid userId, [FromBody] DoctorUpdateProfileDto updateDto)
+        {
+            var result = await _doctorRepository.UpdateDoctorProfileAsync(userId, updateDto);
+            if (!result)
+                return NotFound(new { message = "Doctor not found." });
+
+            var updatedDoctor = await _doctorRepository.GetDoctorByUserIdAsync(userId);
+            if (updatedDoctor == null)
+                return NotFound(new { message = "Doctor not found after update." });
+
+            var doctorDto = _mapper.Map<DoctorDto>(updatedDoctor);
+            return Ok(doctorDto);
+        }
+
+        [HttpPost("appointments/diagnosis/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> AddDiagnosis(Guid appointmentId, [FromBody] AddDiagnosisDto dto)
+        {
+            if (appointmentId != dto.AppointmentId)
+                return BadRequest(new { message = "AppointmentId mismatch." });
+
+            var diagnosis = await _appointmentRepository.AddDiagnosisAsync(dto);
+            var diagnosisDto = _mapper.Map<DiagnosisDto>(diagnosis);
+            return Ok(diagnosisDto);
+        }
     }
 }
 

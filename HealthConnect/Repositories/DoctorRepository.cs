@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using HealthConnect.Data;
 using HealthConnect.Models;
+using HealthConnect.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthConnect.Repositories
@@ -41,6 +42,23 @@ namespace HealthConnect.Repositories
                 return false;
 
             doctor.ProfileImage = profileImagePath;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateDoctorProfileAsync(Guid userId, DoctorUpdateProfileDto updateDto)
+        {
+            var doctor = await _context.Doctors.Include(d => d.User).FirstOrDefaultAsync(d => d.UserId == userId);
+            if (doctor == null || doctor.User == null)
+                return false;
+
+            doctor.User.Name = updateDto.Name;
+           
+            doctor.YearsOfExperience = updateDto.YearsOfExperience;
+            doctor.Bio = updateDto.Bio;
+           
+            doctor.User.PhoneNumber = updateDto.PhoneNumber;
+            // doctor.BID = updateDto.BID; // Add this if BID exists in Doctor model
             await _context.SaveChangesAsync();
             return true;
         }

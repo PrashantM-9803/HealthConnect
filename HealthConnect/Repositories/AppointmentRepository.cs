@@ -127,6 +127,24 @@ namespace HealthConnect.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<Diagnosis> AddDiagnosisAsync(AddDiagnosisDto dto)
+        {
+            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            if (appointment == null)
+                throw new Exception("Appointment not found.");
+
+            var diagnosis = new Diagnosis
+            {
+                Id = Guid.NewGuid(),
+                AppointmentId = dto.AppointmentId,
+                PatientId = dto.PatientId,
+                DiagnosisDetails = dto.DiagnosisDetails
+            };
+            _context.Add(diagnosis);
+            await _context.SaveChangesAsync();
+            return diagnosis;
+        }
     }
 }
 
