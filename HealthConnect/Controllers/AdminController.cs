@@ -49,10 +49,21 @@ namespace HealthConnect.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeletePatient(Guid patientId)
         {
-            var result = await _patientRepository.DeletePatientAsync(patientId);
+            var result = await _adminRepository.DeletePatientAsync(patientId);
             if (!result)
                 return NotFound(new { message = "Patient not found." });
-            return NoContent();
+            return Ok("patient deleted successfully");
+        }
+
+        // DELETE: api/admin/doctors/{userId}
+        [HttpDelete("doctors/{userId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeleteDoctor(Guid userId)
+        {
+            var result = await _adminRepository.DeleteDoctorAsync(userId);
+            if (!result)
+                return NotFound(new { message = "Doctor not found." });
+            return Ok("doctor deleted successfully");
         }
 
         // PUT: api/admin/users/password/{userId}

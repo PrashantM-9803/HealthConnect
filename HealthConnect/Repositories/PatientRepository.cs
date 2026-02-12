@@ -93,14 +93,5 @@ namespace HealthConnect.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool> DeletePatientAsync(Guid patientId)
-        {
-            var patient = await _context.Patients.FindAsync(patientId);
-            if (patient == null)
-                return false;
-            _context.Patients.Remove(patient);
-            await _context.SaveChangesAsync();
-            return true;
-        }
     }
 }

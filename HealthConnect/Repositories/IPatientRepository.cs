@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using HealthConnect.Models;
 using HealthConnect.Models.Dto;
@@ -12,6 +13,5 @@ namespace HealthConnect.Repositories
         Task<List<Patient>> GetAllPatientsAsync();
         Task<bool> UpdatePatientProfileAsync(Guid userId, PatientUpdateProfileDto updateDto);
         Task<bool> UpdatePatientProfileImageAsync(Guid userId, string profileImagePath);
-        Task<bool> DeletePatientAsync(Guid patientId);
     }
 }
