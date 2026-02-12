@@ -10,6 +10,8 @@ namespace HealthConnect.Models.Dto
         public Guid? DoctorId { get; set; }
         public string BloodGroup { get; set; }
 
+        public string? Address { get; set; }
+
         public string ProfileImage { get; set; }
 
 

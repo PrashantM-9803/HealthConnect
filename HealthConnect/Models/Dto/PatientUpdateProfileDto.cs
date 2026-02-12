@@ -9,5 +9,6 @@ namespace HealthConnect.Models.Dto
         public string Phone { get; set; }
         public DateTime? Dob { get; set; }
         public string? Address { get; set; }
+        public string? BloodGroup { get; set; }
     }
 }
