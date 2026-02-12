@@ -16,6 +16,9 @@ namespace HealthConnect.Data
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<DoctorSlot> DoctorSlots { get; set; }
+        public DbSet<Vitals> Vitals { get; set; }
+        public DbSet<Medications> Medications { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

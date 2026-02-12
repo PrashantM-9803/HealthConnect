@@ -145,6 +145,120 @@ namespace HealthConnect.Repositories
             await _context.SaveChangesAsync();
             return diagnosis;
         }
+
+        public async Task<Vitals> AddVitalsAsync(AddVitalsDto dto)
+        {
+            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            if (appointment == null)
+                throw new Exception("Appointment not found.");
+
+            var existingVitals = await _context.Vitals.FirstOrDefaultAsync(v => v.AppointmentId == dto.AppointmentId);
+            if (existingVitals != null)
+            {
+                // Update existing
+                existingVitals.BloodPressure = dto.BloodPressure;
+                existingVitals.HeartRate = dto.HeartRate;
+                existingVitals.Temperature = dto.Temperature;
+                existingVitals.SpO2 = dto.SpO2;
+                await _context.SaveChangesAsync();
+                return existingVitals;
+            }
+            else
+            {
+                // Create new
+                var vitals = new Vitals
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = dto.AppointmentId,
+                    PatientId = dto.PatientId,
+                    BloodPressure = dto.BloodPressure,
+                    HeartRate = dto.HeartRate,
+                    Temperature = dto.Temperature,
+                    SpO2 = dto.SpO2
+                };
+                _context.Vitals.Add(vitals);
+                await _context.SaveChangesAsync();
+                return vitals;
+            }
+        }
+
+        public async Task<Medications> AddMedicationsAsync(AddMedicationsDto dto)
+        {
+            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            if (appointment == null)
+                throw new Exception("Appointment not found.");
+
+            var existingMedications = await _context.Medications.FirstOrDefaultAsync(m => m.AppointmentId == dto.AppointmentId);
+            if (existingMedications != null)
+            {
+                // Update existing
+                existingMedications.Drug = dto.Drug;
+                existingMedications.Dose = dto.Dose;
+                existingMedications.Route = dto.Route;
+                existingMedications.Frequency = dto.Frequency;
+                existingMedications.Activity = (HealthConnect.Models.Activity)dto.Activity;
+                await _context.SaveChangesAsync();
+                return existingMedications;
+            }
+            else
+            {
+                // Create new
+                var medications = new Medications
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = dto.AppointmentId,
+                    PatientId = dto.PatientId,
+                    Drug = dto.Drug,
+                    Dose = dto.Dose,
+                    Route = dto.Route,
+                    Frequency = dto.Frequency,
+                    Activity = (HealthConnect.Models.Activity)dto.Activity
+                };
+                _context.Medications.Add(medications);
+                await _context.SaveChangesAsync();
+                return medications;
+            }
+        }
+
+        public async Task<Invoice> AddInvoiceAsync(AddInvoiceDto dto)
+        {
+            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            if (appointment == null)
+                throw new Exception("Appointment not found.");
+
+            var existingInvoice = await _context.Invoices.FirstOrDefaultAsync(i => i.AppointmentId == dto.AppointmentId);
+            if (existingInvoice != null)
+            {
+                // Update existing invoice
+                existingInvoice.ConsultationType = dto.ConsultationType;
+                existingInvoice.ConsulationFee = dto.ConsulationFee;
+                existingInvoice.LabFee = dto.LabFee;
+                existingInvoice.MedicineFee = dto.MedicineFee;
+                existingInvoice.Total = dto.Total;
+                await _context.SaveChangesAsync();
+                return existingInvoice;
+            }
+            else
+            {
+                // Create new invoice
+                var invoice = new Invoice
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = dto.AppointmentId,
+                    PatientId = dto.PatientId,
+                    ConsultationType = dto.ConsultationType,
+                    ConsulationFee = dto.ConsulationFee,
+                    LabFee = dto.LabFee,
+                    MedicineFee = dto.MedicineFee,
+                    Total = dto.Total,
+                    Status = "Pending", // Set default status
+                    IssuedDate = DateTime.UtcNow // Set issued date
+                };
+                _context.Invoices.Add(invoice);
+                await _context.SaveChangesAsync();
+                return invoice;
+            }
+        }
     }
 }
 

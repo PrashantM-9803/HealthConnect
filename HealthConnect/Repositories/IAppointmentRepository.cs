@@ -15,6 +15,9 @@ namespace HealthConnect.Repositories
         Task<bool> CancelAppointmentAsync(Guid appointmentId);
         Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, AppointmentStatus status);
         Task<Diagnosis> AddDiagnosisAsync(AddDiagnosisDto dto);
+        Task<Vitals> AddVitalsAsync(AddVitalsDto dto);
+        Task<Medications> AddMedicationsAsync(AddMedicationsDto dto);
+        Task<Invoice> AddInvoiceAsync(AddInvoiceDto dto);
     }
 }
 

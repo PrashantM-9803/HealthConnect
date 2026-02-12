@@ -108,6 +108,42 @@ namespace HealthConnect.Controllers
             var diagnosisDto = _mapper.Map<DiagnosisDto>(diagnosis);
             return Ok(diagnosisDto);
         }
+
+        [HttpPost("appointments/vitals/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> AddVitals(Guid appointmentId, [FromBody] AddVitalsDto dto)
+        {
+            if (appointmentId != dto.AppointmentId)
+                return BadRequest(new { message = "AppointmentId mismatch." });
+
+            var vitals = await _appointmentRepository.AddVitalsAsync(dto);
+            var vitalsDto = _mapper.Map<VitalsDto>(vitals);
+            return Ok(vitalsDto);
+        }
+
+        [HttpPost("appointments/medications/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> AddMedications(Guid appointmentId, [FromBody] AddMedicationsDto dto)
+        {
+            if (appointmentId != dto.AppointmentId)
+                return BadRequest(new { message = "AppointmentId mismatch." });
+
+            var medications = await _appointmentRepository.AddMedicationsAsync(dto);
+            var medicationsDto = _mapper.Map<MedicationsDto>(medications);
+            return Ok(medicationsDto);
+        }
+
+        [HttpPost("appointments/invoice/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> AddInvoice(Guid appointmentId, [FromBody] AddInvoiceDto dto)
+        {
+            if (appointmentId != dto.AppointmentId)
+                return BadRequest(new { message = "AppointmentId mismatch." });
+
+            var invoice = await _appointmentRepository.AddInvoiceAsync(dto);
+            var invoiceDto = _mapper.Map<InvoiceDto>(invoice);
+            return Ok(invoiceDto);
+        }
     }
 }
 

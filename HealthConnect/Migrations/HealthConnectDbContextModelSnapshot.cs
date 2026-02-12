@@ -181,6 +181,9 @@ namespace HealthConnect.Migrations
                     b.Property<int>("LabFee")
                         .HasColumnType("int");
 
+                    b.Property<int>("MedicineFee")
+                        .HasColumnType("int");
+
                     b.Property<int?>("Outstanding")
                         .HasColumnType("int");
 
@@ -201,7 +204,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Invoice");
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Medications", b =>

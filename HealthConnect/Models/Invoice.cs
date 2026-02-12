@@ -13,6 +13,8 @@
 
         public int LabFee { get; set; }
 
+        public int MedicineFee { get; set; } // Added property
+
         public int Total { get; set; }
         public int? Outstanding { get; set; }
     
