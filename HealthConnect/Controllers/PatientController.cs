@@ -73,15 +73,39 @@ namespace HealthConnect.Controllers
         [Authorize(Roles = "PATIENT")]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto dto)
         {
-            var patient = await _patientRepository.GetPatientByUserIdAsync(dto.PatientId);
-            if (patient == null)
-                return BadRequest(new { message = "No patient found for this user." });
+            try
+            {
+                var patient = await _patientRepository.GetPatientByUserIdAsync(dto.PatientId);
+                if (patient == null)
+                    return BadRequest(new { message = "No patient found for this user." });
 
-            dto.PatientId = patient.Id;
-            var appointment = await _appointmentRepository.CreateAppointmentAsync(dto);
-            var appointmentDto = _mapper.Map<AppointmentDto>(appointment);
-            return Ok(appointmentDto);
+                dto.PatientId = patient.Id;
+                var appointment = await _appointmentRepository.CreateAppointmentAsync(dto);
+                var appointmentDto = _mapper.Map<AppointmentDto>(appointment);
+                return Ok(new 
+                { 
+                    message = "Appointment created successfully.",
+                    appointment = appointmentDto 
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
+        // Cancel appointment
+        [HttpPut("appointments/{appointmentId}/cancel")]
+        [Authorize(Roles = "PATIENT,DOCTOR,ADMIN")]
+        public async Task<IActionResult> CancelAppointment(Guid appointmentId)
+        {
+            var result = await _appointmentRepository.CancelAppointmentAsync(appointmentId);
+            if (!result)
+                return NotFound(new { message = "Appointment not found." });
+
+            return Ok(new { message = "Appointment cancelled successfully." });
+        }
+
 
         // Get appointment by id
         [HttpGet("appointments/{appointmentId}")]

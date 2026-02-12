@@ -6,7 +6,8 @@ namespace HealthConnect.Models.Dto
     {
         public Guid DoctorId { get; set; }
         public Guid PatientId { get; set; }
-        public DateTime AppointmentDate { get; set; }
+        public Guid SlotId { get; set; }
         public string Reason { get; set; }
     }
 }
+

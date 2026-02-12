@@ -12,5 +12,8 @@ namespace HealthConnect.Repositories
         Task<Appointment> GetAppointmentByIdAsync(Guid id);
         Task<IEnumerable<Appointment>> GetAppointmentsByPatientIdAsync(Guid patientId);
         Task<IEnumerable<Appointment>> GetAppointmentsByDoctorIdAsync(Guid doctorId);
+        Task<bool> CancelAppointmentAsync(Guid appointmentId);
+        Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, AppointmentStatus status);
     }
 }
+

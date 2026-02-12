@@ -34,12 +34,21 @@ namespace HealthConnect.Migrations
                     b.Property<Guid>("DoctorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SlotId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -49,6 +58,9 @@ namespace HealthConnect.Migrations
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("SlotId")
+                        .IsUnique();
 
                     b.ToTable("Appointments");
                 });
@@ -111,6 +123,40 @@ namespace HealthConnect.Migrations
                         .IsUnique();
 
                     b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("HealthConnect.Models.DoctorSlot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsBooked")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorSlots");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Invoice", b =>
@@ -490,9 +536,17 @@ namespace HealthConnect.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HealthConnect.Models.DoctorSlot", "Slot")
+                        .WithOne("Appointment")
+                        .HasForeignKey("HealthConnect.Models.Appointment", "SlotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Slot");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Diagnosis", b =>
@@ -523,6 +577,17 @@ namespace HealthConnect.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HealthConnect.Models.DoctorSlot", b =>
+                {
+                    b.HasOne("HealthConnect.Models.Doctor", "Doctor")
+                        .WithMany("DoctorSlots")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Invoice", b =>
@@ -670,7 +735,14 @@ namespace HealthConnect.Migrations
                 {
                     b.Navigation("Appointments");
 
+                    b.Navigation("DoctorSlots");
+
                     b.Navigation("Patients");
+                });
+
+            modelBuilder.Entity("HealthConnect.Models.DoctorSlot", b =>
+                {
+                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Patient", b =>
