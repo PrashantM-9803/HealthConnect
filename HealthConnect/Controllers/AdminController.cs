@@ -12,12 +12,14 @@ namespace HealthConnect.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly IAdminRepository _adminRepository;
         private readonly IMapper _mapper;
 
-        public AdminController(IPatientRepository patientRepository, IAdminRepository adminRepository, IMapper mapper)
+        public AdminController(IPatientRepository patientRepository, IDoctorRepository doctorRepository, IAdminRepository adminRepository, IMapper mapper)
         {
             _patientRepository = patientRepository;
+            _doctorRepository = doctorRepository;
             _adminRepository = adminRepository;
             _mapper = mapper;
         }
@@ -30,6 +32,16 @@ namespace HealthConnect.Controllers
             var patients = await _patientRepository.GetAllPatientsAsync();
             var patientDtos = _mapper.Map<List<HealthConnect.Models.Dto.PatientDto>>(patients);
             return Ok(patientDtos);
+        }
+
+        // GET: api/admin/doctors
+        [HttpGet("doctors")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetAllDoctors()
+        {
+            var doctors = await _doctorRepository.GetAllDoctorsAsync();
+            var doctorDtos = _mapper.Map<List<HealthConnect.Models.Dto.DoctorDto>>(doctors);
+            return Ok(doctorDtos);
         }
 
         // DELETE: api/admin/patients/{id}
