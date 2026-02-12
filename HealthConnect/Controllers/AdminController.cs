@@ -44,15 +44,43 @@ namespace HealthConnect.Controllers
             return Ok(doctorDtos);
         }
 
-        // DELETE: api/admin/patients/{id}
-        [HttpDelete("patients/{patientId}")]
+        // GET: api/admin/appointments
+        [HttpGet("appointments")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> DeletePatient(Guid patientId)
+        public async Task<IActionResult> GetAllAppointments()
         {
-            var result = await _adminRepository.DeletePatientAsync(patientId);
+            var appointments = await _adminRepository.GetAllAppointmentsAsync();
+            var appointmentDtos = _mapper.Map<List<HealthConnect.Models.Dto.AppointmentDto>>(appointments);
+            return Ok(appointmentDtos);
+        }
+
+        // GET: api/admin/patients/total
+        [HttpGet("patients/total")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetTotalPatients()
+        {
+            var totalPatients = await _adminRepository.GetTotalPatientsAsync();
+            return Ok(new TotalPatientsDto { TotalPatients = totalPatients });
+        }
+
+        // GET: api/admin/appointments/total
+        [HttpGet("appointments/total")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetTotalAppointments()
+        {
+            var totalAppointments = await _adminRepository.GetTotalAppointmentsAsync();
+            return Ok(new TotalAppointmentsDto { TotalAppointments = totalAppointments });
+        }
+
+        // DELETE: api/admin/patients/{userId}
+        [HttpDelete("patients/{userId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeletePatient(Guid userId)
+        {
+            var result = await _adminRepository.DeletePatientAsync(userId);
             if (!result)
                 return NotFound(new { message = "Patient not found." });
-            return Ok("patient deleted successfully");
+            return Ok(new { message = "Patient deleted successfully." });
         }
 
         // DELETE: api/admin/doctors/{userId}
@@ -63,7 +91,7 @@ namespace HealthConnect.Controllers
             var result = await _adminRepository.DeleteDoctorAsync(userId);
             if (!result)
                 return NotFound(new { message = "Doctor not found." });
-            return Ok("doctor deleted successfully");
+            return Ok(new { message = "Doctor deleted successfully." });
         }
 
         // PUT: api/admin/users/password/{userId}

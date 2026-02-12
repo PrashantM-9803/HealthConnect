@@ -20,7 +20,7 @@ namespace HealthConnect.Repositories
             _context = context;
         }
 
-        public async Task<User> RegisterAsync(SignupRequestDto signupDto)
+        public async Task<(User user, IEnumerable<IdentityError> errors)> RegisterAsync(SignupRequestDto signupDto)
         {
             var user = new User
             {
@@ -33,11 +33,11 @@ namespace HealthConnect.Repositories
 
             // Only assign if role exists
             if (!await _roleManager.RoleExistsAsync(signupDto.Role))
-                return null;
+                return (null, new List<IdentityError> { new IdentityError { Description = $"Role '{signupDto.Role}' does not exist." } });
 
             var result = await _userManager.CreateAsync(user, signupDto.Password);
             if (!result.Succeeded)
-                return null;
+                return (null, result.Errors);
 
             await _userManager.AddToRoleAsync(user, signupDto.Role);
 
@@ -69,7 +69,7 @@ namespace HealthConnect.Repositories
                 await _context.SaveChangesAsync();
             }
 
-            return user;
+            return (user, null);
         }
 
         public async Task<User> LoginAsync(LoginRequestDto loginDto)
