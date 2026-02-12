@@ -102,9 +102,32 @@ namespace HealthConnect.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Appointment>> GetPendingAppointmentsAsync()
+        {
+            return await _context.Appointments
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(a => a.Slot)
+                .Include(a => a.Invoice)
+                .Include(a => a.Medications)
+                .Include(a => a.Vitals)
+                .Include(a => a.Diagnosis)
+                .Where(a => a.Status == AppointmentStatus.Pending)
+                .OrderByDescending(a => a.AppointmentDate)
+                .ThenBy(a => a.StartTime)
+                .ToListAsync();
+        }
+
         public async Task<int> GetTotalPatientsAsync()
         {
             return await _context.Patients.CountAsync();
+        }
+
+        public async Task<int> GetTotalDoctorsAsync()
+        {
+            return await _context.Doctors.CountAsync();
         }
 
         public async Task<int> GetTotalAppointmentsAsync()

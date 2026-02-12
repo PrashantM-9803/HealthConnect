@@ -11,7 +11,9 @@ namespace HealthConnect.Repositories
         Task<bool> DeletePatientAsync(Guid userId);
         Task<bool> DeleteDoctorAsync(Guid userId);
         Task<List<Appointment>> GetAllAppointmentsAsync();
+        Task<List<Appointment>> GetPendingAppointmentsAsync();
         Task<int> GetTotalPatientsAsync();
+        Task<int> GetTotalDoctorsAsync();
         Task<int> GetTotalAppointmentsAsync();
     }
 }

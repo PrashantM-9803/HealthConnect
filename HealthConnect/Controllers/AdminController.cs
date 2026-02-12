@@ -54,6 +54,16 @@ namespace HealthConnect.Controllers
             return Ok(appointmentDtos);
         }
 
+        // GET: api/admin/appointments/pending
+        [HttpGet("appointments/pending")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetPendingAppointments()
+        {
+            var appointments = await _adminRepository.GetPendingAppointmentsAsync();
+            var appointmentDtos = _mapper.Map<List<HealthConnect.Models.Dto.AppointmentDto>>(appointments);
+            return Ok(appointmentDtos);
+        }
+
         // GET: api/admin/patients/total
         [HttpGet("patients/total")]
         [Authorize(Roles = "ADMIN")]
@@ -61,6 +71,15 @@ namespace HealthConnect.Controllers
         {
             var totalPatients = await _adminRepository.GetTotalPatientsAsync();
             return Ok(new TotalPatientsDto { TotalPatients = totalPatients });
+        }
+
+        // GET: api/admin/doctors/total
+        [HttpGet("doctors/total")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetTotalDoctors()
+        {
+            var totalDoctors = await _adminRepository.GetTotalDoctorsAsync();
+            return Ok(new TotalDoctorsDto { TotalDoctors = totalDoctors });
         }
 
         // GET: api/admin/appointments/total
