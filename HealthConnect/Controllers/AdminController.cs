@@ -28,5 +28,17 @@ namespace HealthConnect.Controllers
             var patientDtos = _mapper.Map<List<HealthConnect.Models.Dto.PatientDto>>(patients);
             return Ok(patientDtos);
         }
+
+        // DELETE: api/admin/patients/{id}
+        [HttpDelete("patients/{patientId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeletePatient(Guid patientId)
+        {
+            var result = await _patientRepository.DeletePatientAsync(patientId);
+            if (!result)
+                return NotFound(new { message = "Patient not found." });
+            return NoContent();
+        }
+
     }
 }
