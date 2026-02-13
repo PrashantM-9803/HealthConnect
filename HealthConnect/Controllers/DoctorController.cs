@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using HealthConnect.Models;
 using HealthConnect.Models.Dto;
 using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -156,6 +157,24 @@ namespace HealthConnect.Controllers
                 totalPatients = patientDtos.Count(),
                 patients = patientDtos
             });
+        }
+
+        [HttpPut("appointments/complete/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> CompleteAppointment(Guid appointmentId)
+        {
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+            if (appointment == null)
+                return NotFound(new { message = "Appointment not found." });
+
+            if (appointment.Status != AppointmentStatus.Pending)
+                return BadRequest(new { message = "Only pending appointments can be marked as completed." });
+
+            var updated = await _appointmentRepository.UpdateAppointmentStatusAsync(appointmentId, AppointmentStatus.Completed);
+            if (!updated)
+                return NotFound(new { message = "Appointment not found." });
+
+            return Ok(new { message = "Appointment marked as completed.", appointmentId });
         }
     }
 }
