@@ -76,6 +76,7 @@ namespace HealthConnect.Repositories
 
             // Update Patient fields
             patient.Address = updateDto.Address;
+            patient.BloodGroup = updateDto.BloodGroup;
 
             await _context.SaveChangesAsync();
             return true;
