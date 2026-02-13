@@ -96,6 +96,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IDoctorSlotRepository, DoctorSlotRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
 
 // Add CORS

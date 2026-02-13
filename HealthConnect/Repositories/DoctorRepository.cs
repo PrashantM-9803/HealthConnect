@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,16 @@ namespace HealthConnect.Repositories
         public DoctorRepository(HealthConnectDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<List<Doctor>> GetAllDoctorsAsync()
+        {
+            return await _context.Doctors
+                .Include(d => d.User)
+                .Include(d => d.Patients)
+                .Include(d => d.Appointments)
+                .Include(d => d.DoctorSlots)
+                .ToListAsync();
         }
 
         public async Task<Doctor?> GetDoctorByUserIdAsync(Guid userId)
