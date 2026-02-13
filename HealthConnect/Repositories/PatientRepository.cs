@@ -23,10 +23,6 @@ namespace HealthConnect.Repositories
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
                 .ToListAsync();
         }
 
@@ -36,10 +32,6 @@ namespace HealthConnect.Repositories
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
@@ -53,10 +45,6 @@ namespace HealthConnect.Repositories
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 

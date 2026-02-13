@@ -88,7 +88,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Diagnosis");
+                    b.ToTable("Diagnoses");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Doctor", b =>
@@ -240,8 +240,7 @@ namespace HealthConnect.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId")
-                        .IsUnique();
+                    b.HasIndex("AppointmentId");
 
                     b.HasIndex("PatientId");
 
@@ -561,9 +560,9 @@ namespace HealthConnect.Migrations
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
-                        .WithMany("Diagnoses")
+                        .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -598,13 +597,13 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
                         .WithOne("Invoice")
                         .HasForeignKey("HealthConnect.Models.Invoice", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
-                        .WithMany("Invoices")
+                        .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -615,15 +614,15 @@ namespace HealthConnect.Migrations
             modelBuilder.Entity("HealthConnect.Models.Medications", b =>
                 {
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
-                        .WithOne("Medications")
-                        .HasForeignKey("HealthConnect.Models.Medications", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Medications")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
-                        .WithMany("Medications")
+                        .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -654,13 +653,13 @@ namespace HealthConnect.Migrations
                     b.HasOne("HealthConnect.Models.Appointment", "Appointment")
                         .WithOne("Vitals")
                         .HasForeignKey("HealthConnect.Models.Vitals", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HealthConnect.Models.Patient", "Patient")
-                        .WithMany("Vitals")
+                        .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -727,8 +726,7 @@ namespace HealthConnect.Migrations
                     b.Navigation("Invoice")
                         .IsRequired();
 
-                    b.Navigation("Medications")
-                        .IsRequired();
+                    b.Navigation("Medications");
 
                     b.Navigation("Vitals")
                         .IsRequired();
@@ -751,14 +749,6 @@ namespace HealthConnect.Migrations
             modelBuilder.Entity("HealthConnect.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("Diagnoses");
-
-                    b.Navigation("Invoices");
-
-                    b.Navigation("Medications");
-
-                    b.Navigation("Vitals");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.User", b =>
