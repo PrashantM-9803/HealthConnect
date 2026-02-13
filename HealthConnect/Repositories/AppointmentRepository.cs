@@ -31,6 +31,14 @@ namespace HealthConnect.Repositories
             if (slot.DoctorId != dto.DoctorId)
                 throw new Exception("Slot does not belong to the specified doctor.");
 
+            // Get the patient
+            var patient = await _context.Patients.FindAsync(dto.PatientId);
+            if (patient == null)
+                throw new Exception("Patient not found.");
+
+            // Always update patient's doctor to the most recent doctor they book with
+            patient.DoctorId = dto.DoctorId;
+
             // Create the appointment
             var appointment = new Appointment
             {
