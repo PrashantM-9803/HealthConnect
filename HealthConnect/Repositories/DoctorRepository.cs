@@ -79,10 +79,9 @@ namespace HealthConnect.Repositories
                 return false;
 
             doctor.User.Name = updateDto.Name;
-           
+            doctor.Specialization = updateDto.Specialization; // Set specialization
             doctor.YearsOfExperience = updateDto.YearsOfExperience;
             doctor.Bio = updateDto.Bio;
-           
             doctor.User.PhoneNumber = updateDto.PhoneNumber;
             // doctor.BID = updateDto.BID; // Add this if BID exists in Doctor model
             await _context.SaveChangesAsync();
