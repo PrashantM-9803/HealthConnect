@@ -36,7 +36,7 @@ namespace HealthConnect.Controllers
 
         // GET: api/admin/doctors
         [HttpGet("doctors")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "PATIENT,ADMIN")]
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _doctorRepository.GetAllDoctorsAsync();
