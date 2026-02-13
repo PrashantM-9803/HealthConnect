@@ -39,9 +39,18 @@ namespace HealthConnect.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] SignupRequestDto signupDto)
         {
-            var user = await _authRepository.RegisterAsync(signupDto);
+            // Check if user already exists
+            var existingUser = await _userManager.FindByEmailAsync(signupDto.Email);
+            if (existingUser != null)
+                return BadRequest(new { message = "User with this email already exists." });
+
+            var (user, errors) = await _authRepository.RegisterAsync(signupDto);
             if (user == null)
-                return BadRequest("User registration failed.");
+            {
+                var errorMessages = errors.Select(e => e.Description);
+                return BadRequest(new { message = "User registration failed.", errors = errorMessages });
+            }
+            
             var userDto = _mapper.Map<LoginResponseDto>(user);
             userDto.Role = signupDto.Role;
 
