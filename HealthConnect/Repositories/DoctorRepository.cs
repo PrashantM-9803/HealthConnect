@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using HealthConnect.Data;
 using HealthConnect.Models;
 using HealthConnect.Models.Dto;
@@ -21,16 +23,29 @@ namespace HealthConnect.Repositories
                 .Include(d => d.User)
                 .Include(d => d.Patients)
                 .Include(d => d.Appointments)
+                
                 .FirstOrDefaultAsync(d => d.UserId == userId);
         }
 
         public async Task<Doctor?> GetDoctorByIdAsync(Guid id)
         {
-            return await _context.Doctors
+            var doctor = await _context.Doctors
                 .Include(d => d.User)
-                .Include(d => d.Patients)
                 .Include(d => d.Appointments)
+                .ThenInclude(a => a.Patient)
                 .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (doctor != null)
+            {
+                // Get all distinct patients who have appointments with this doctor
+                var patientIds = doctor.Appointments.Select(a => a.PatientId).Distinct().ToList();
+                var patients = await _context.Patients
+                    .Where(p => patientIds.Contains(p.Id))
+                    .Include(p => p.User)
+                    .ToListAsync();
+                doctor.Patients = patients;
+            }
+            return doctor;
         }
 
         public async Task<bool> UpdateDoctorProfileImageAsync(Guid userId, string profileImagePath)
@@ -61,6 +76,21 @@ namespace HealthConnect.Repositories
             // doctor.BID = updateDto.BID; // Add this if BID exists in Doctor model
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<Patient>> GetPatientsByDoctorIdAsync(Guid doctorId)
+        {
+            // Get all distinct patients who have booked appointments with the doctor
+            var patientIds = await _context.Appointments
+                .Where(a => a.DoctorId == doctorId)
+                .Select(a => a.PatientId)
+                .Distinct()
+                .ToListAsync();
+
+            return await _context.Patients
+                .Where(p => patientIds.Contains(p.Id))
+                .Include(p => p.User)
+                .ToListAsync();
         }
     }
 }

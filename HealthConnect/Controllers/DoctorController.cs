@@ -144,6 +144,19 @@ namespace HealthConnect.Controllers
             var invoiceDto = _mapper.Map<InvoiceDto>(invoice);
             return Ok(invoiceDto);
         }
+
+        [HttpGet("patients/{doctorId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> GetPatientsByDoctorId(Guid doctorId)
+        {
+            var patients = await _doctorRepository.GetPatientsByDoctorIdAsync(doctorId);
+            var patientDtos = _mapper.Map<IEnumerable<PatientDto>>(patients);
+            return Ok(new {
+                doctorId = doctorId,
+                totalPatients = patientDtos.Count(),
+                patients = patientDtos
+            });
+        }
     }
 }
 
