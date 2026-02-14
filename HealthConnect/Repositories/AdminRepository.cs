@@ -180,5 +180,20 @@ namespace HealthConnect.Repositories
                 .OrderByDescending(i => i.IssuedDate)
                 .ToListAsync();
         }
+
+        public async Task<bool> MarkInvoiceAsPaidAsync(Guid invoiceId)
+        {
+            var invoice = await _context.Invoices.FindAsync(invoiceId);
+            if (invoice == null)
+                return false;
+
+            // Only update if the invoice is currently pending
+            if (invoice.Status != InvoiceStatus.Pending)
+                return false;
+
+            invoice.Status = InvoiceStatus.Paid;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

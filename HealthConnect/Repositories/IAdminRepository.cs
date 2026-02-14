@@ -18,5 +18,6 @@ namespace HealthConnect.Repositories
         Task<List<Invoice>> GetPendingInvoicesAsync();
         Task<(int totalAmount, int todaysAmount)> GetTotalPaidInvoicesAmountAsync();
         Task<List<Invoice>> GetAllInvoicesAsync();
+        Task<bool> MarkInvoiceAsPaidAsync(Guid invoiceId);
     }
 }

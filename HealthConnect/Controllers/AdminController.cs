@@ -136,6 +136,18 @@ namespace HealthConnect.Controllers
             });
         }
 
+        // PUT: api/admin/invoices/{invoiceId}/mark-paid
+        [HttpPut("invoices/mark-paid/{invoiceId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> MarkInvoiceAsPaid(Guid invoiceId)
+        {
+            var result = await _adminRepository.MarkInvoiceAsPaidAsync(invoiceId);
+            if (!result)
+                return NotFound(new { message = "Invoice not found or already paid." });
+
+            return Ok(new { message = "Invoice marked as paid successfully." });
+        }
+
         // DELETE: api/admin/patients/{userId}
         [HttpDelete("patients/{userId}")]
         [Authorize(Roles = "ADMIN")]
