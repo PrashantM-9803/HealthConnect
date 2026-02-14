@@ -130,9 +130,16 @@ namespace HealthConnect.Repositories
             return await _context.Doctors.CountAsync();
         }
 
-        public async Task<int> GetTotalAppointmentsAsync()
+        public async Task<(int totalAppointments, int todaysAppointments)> GetTotalAppointmentsAsync()
         {
-            return await _context.Appointments.CountAsync();
+            var totalAppointments = await _context.Appointments.CountAsync();
+            
+            var today = DateTime.Today;
+            var todaysAppointments = await _context.Appointments
+                .Where(a => a.AppointmentDate.Date == today)
+                .CountAsync();
+            
+            return (totalAppointments, todaysAppointments);
         }
 
         public async Task<List<Invoice>> GetPendingInvoicesAsync()
@@ -148,13 +155,18 @@ namespace HealthConnect.Repositories
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalPaidInvoicesAmountAsync()
+        public async Task<(int totalAmount, int todaysAmount)> GetTotalPaidInvoicesAmountAsync()
         {
             var totalAmount = await _context.Invoices
                 .Where(i => i.Status == InvoiceStatus.Paid)
                 .SumAsync(i => i.Total);
             
-            return totalAmount;
+            var today = DateTime.Today;
+            var todaysAmount = await _context.Invoices
+                .Where(i => i.Status == InvoiceStatus.Paid && i.IssuedDate.Date == today)
+                .SumAsync(i => (int?)i.Total) ?? 0;
+            
+            return (totalAmount, todaysAmount);
         }
 
         public async Task<List<Invoice>> GetAllInvoicesAsync()

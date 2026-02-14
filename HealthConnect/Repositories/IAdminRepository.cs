@@ -14,9 +14,9 @@ namespace HealthConnect.Repositories
         Task<List<Appointment>> GetPendingAppointmentsAsync();
         Task<int> GetTotalPatientsAsync();
         Task<int> GetTotalDoctorsAsync();
-        Task<int> GetTotalAppointmentsAsync();
+        Task<(int totalAppointments, int todaysAppointments)> GetTotalAppointmentsAsync();
         Task<List<Invoice>> GetPendingInvoicesAsync();
-        Task<int> GetTotalPaidInvoicesAmountAsync();
+        Task<(int totalAmount, int todaysAmount)> GetTotalPaidInvoicesAmountAsync();
         Task<List<Invoice>> GetAllInvoicesAsync();
     }
 }

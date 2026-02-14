@@ -87,8 +87,12 @@ namespace HealthConnect.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetTotalAppointments()
         {
-            var totalAppointments = await _adminRepository.GetTotalAppointmentsAsync();
-            return Ok(new TotalAppointmentsDto { TotalAppointments = totalAppointments });
+            var (totalAppointments, todaysAppointments) = await _adminRepository.GetTotalAppointmentsAsync();
+            return Ok(new 
+            { 
+                totalAppointments = totalAppointments,
+                todaysAppointments = todaysAppointments
+            });
         }
 
         // GET: api/admin/invoices/pending
@@ -110,10 +114,11 @@ namespace HealthConnect.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetTotalPaidInvoicesAmount()
         {
-            var totalAmount = await _adminRepository.GetTotalPaidInvoicesAmountAsync();
+            var (totalAmount, todaysAmount) = await _adminRepository.GetTotalPaidInvoicesAmountAsync();
             return Ok(new
             {
-                totalAmount = totalAmount
+                totalAmount = totalAmount,
+                todaysAmount = todaysAmount
             });
         }
 
