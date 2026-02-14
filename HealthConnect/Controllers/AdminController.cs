@@ -161,7 +161,7 @@ namespace HealthConnect.Controllers
         // PUT: api/admin/users/password/{userId}
         [HttpPut("users/password/{userId}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateUserPassword([FromBody] UpdatePasswordDto dto, Guid userId)
+        public async Task<IActionResult> UpdateUserPassword(Guid userId, [FromBody] AdminUpdatePasswordDto dto)
         {
             var result = await _adminRepository.UpdateUserPasswordAsync(userId, dto.NewPassword);
             if (!result)
