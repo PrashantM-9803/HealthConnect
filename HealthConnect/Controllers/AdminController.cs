@@ -91,6 +91,46 @@ namespace HealthConnect.Controllers
             return Ok(new TotalAppointmentsDto { TotalAppointments = totalAppointments });
         }
 
+        // GET: api/admin/invoices/pending
+        [HttpGet("invoices/pending")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetPendingInvoices()
+        {
+            var invoices = await _adminRepository.GetPendingInvoicesAsync();
+            var invoiceDtos = _mapper.Map<List<HealthConnect.Models.Dto.InvoiceDto>>(invoices);
+            return Ok(new
+            {
+                totalCount = invoiceDtos.Count,
+                invoices = invoiceDtos
+            });
+        }
+
+        // GET: api/admin/invoices/paid/total-amount
+        [HttpGet("invoices/paid/total-amount")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetTotalPaidInvoicesAmount()
+        {
+            var totalAmount = await _adminRepository.GetTotalPaidInvoicesAmountAsync();
+            return Ok(new
+            {
+                totalAmount = totalAmount
+            });
+        }
+
+        // GET: api/admin/invoices
+        [HttpGet("invoices")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetAllInvoices()
+        {
+            var invoices = await _adminRepository.GetAllInvoicesAsync();
+            var invoiceDtos = _mapper.Map<List<HealthConnect.Models.Dto.InvoiceDto>>(invoices);
+            return Ok(new
+            {
+                totalCount = invoiceDtos.Count,
+                invoices = invoiceDtos
+            });
+        }
+
         // DELETE: api/admin/patients/{userId}
         [HttpDelete("patients/{userId}")]
         [Authorize(Roles = "ADMIN")]

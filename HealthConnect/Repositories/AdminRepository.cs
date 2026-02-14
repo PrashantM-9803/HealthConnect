@@ -134,5 +134,39 @@ namespace HealthConnect.Repositories
         {
             return await _context.Appointments.CountAsync();
         }
+
+        public async Task<List<Invoice>> GetPendingInvoicesAsync()
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(i => i.Appointment)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                .Where(i => i.Status == InvoiceStatus.Pending)
+                .OrderByDescending(i => i.IssuedDate)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalPaidInvoicesAmountAsync()
+        {
+            var totalAmount = await _context.Invoices
+                .Where(i => i.Status == InvoiceStatus.Paid)
+                .SumAsync(i => i.Total);
+            
+            return totalAmount;
+        }
+
+        public async Task<List<Invoice>> GetAllInvoicesAsync()
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(i => i.Appointment)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                .OrderByDescending(i => i.IssuedDate)
+                .ToListAsync();
+        }
     }
 }
