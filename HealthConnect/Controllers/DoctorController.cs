@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using HealthConnect.Models;
 using HealthConnect.Models.Dto;
 using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -159,18 +160,22 @@ namespace HealthConnect.Controllers
             });
         }
 
-        [HttpPut("appointments/status/{appointmentId}")]
+        [HttpPut("appointments/complete/{appointmentId}")]
         [Authorize(Roles = "DOCTOR,ADMIN")]
-        public async Task<IActionResult> UpdateAppointmentStatus(Guid appointmentId, [FromBody] string status)
+        public async Task<IActionResult> CompleteAppointment(Guid appointmentId)
         {
-            if (!Enum.TryParse<AppointmentStatus>(status, true, out var appointmentStatus))
-                return BadRequest(new { message = "Invalid status. Use 'Completed' or 'Cancelled'." });
-
-            var result = await _appointmentRepository.UpdateAppointmentStatusAsync(appointmentId, appointmentStatus);
-            if (!result)
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+            if (appointment == null)
                 return NotFound(new { message = "Appointment not found." });
 
-            return Ok(new { message = $"Appointment status updated to {appointmentStatus}." });
+            if (appointment.Status != AppointmentStatus.Pending)
+                return BadRequest(new { message = "Only pending appointments can be marked as completed." });
+
+            var updated = await _appointmentRepository.UpdateAppointmentStatusAsync(appointmentId, AppointmentStatus.Completed);
+            if (!updated)
+                return NotFound(new { message = "Appointment not found." });
+
+            return Ok(new { message = "Appointment marked as completed.", appointmentId });
         }
     }
 }

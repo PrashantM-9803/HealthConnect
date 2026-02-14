@@ -22,11 +22,20 @@ namespace HealthConnect.Repositories
             return await _context.Patients
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
+                    .ThenInclude(d => d.User)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
+                    .ThenInclude(a => a.Slot)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Vitals)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Medications)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Invoice)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
                 .ToListAsync();
         }
 
@@ -35,11 +44,20 @@ namespace HealthConnect.Repositories
             return await _context.Patients
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
+                    .ThenInclude(d => d.User)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
+                    .ThenInclude(a => a.Slot)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Vitals)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Medications)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Invoice)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
@@ -52,11 +70,20 @@ namespace HealthConnect.Repositories
             return await _context.Patients
                 .Include(p => p.User)
                 .Include(p => p.Doctor)
+                    .ThenInclude(d => d.User)
                 .Include(p => p.Appointments)
-                .Include(p => p.Vitals)
-                .Include(p => p.Medications)
-                .Include(p => p.Invoices)
-                .Include(p => p.Diagnoses)
+                    .ThenInclude(a => a.Slot)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Vitals)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Medications)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Invoice)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 

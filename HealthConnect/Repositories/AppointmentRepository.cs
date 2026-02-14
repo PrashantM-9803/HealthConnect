@@ -31,6 +31,14 @@ namespace HealthConnect.Repositories
             if (slot.DoctorId != dto.DoctorId)
                 throw new Exception("Slot does not belong to the specified doctor.");
 
+            // Get the patient
+            var patient = await _context.Patients.FindAsync(dto.PatientId);
+            if (patient == null)
+                throw new Exception("Patient not found.");
+
+            // Always update patient's doctor to the most recent doctor they book with
+            patient.DoctorId = dto.DoctorId;
+
             // Create the appointment
             var appointment = new Appointment
             {
@@ -63,6 +71,10 @@ namespace HealthConnect.Repositories
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.User)
                 .Include(a => a.Slot)
+                .Include(a => a.Vitals)
+                .Include(a => a.Medications)
+                .Include(a => a.Invoice)
+                .Include(a => a.Diagnosis)
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
@@ -74,6 +86,10 @@ namespace HealthConnect.Repositories
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.User)
                 .Include(a => a.Slot)
+                .Include(a => a.Vitals)
+                .Include(a => a.Medications)
+                .Include(a => a.Invoice)
+                .Include(a => a.Diagnosis)
                 .Where(a => a.PatientId == patientId)
                 .OrderByDescending(a => a.AppointmentDate)
                 .ThenBy(a => a.StartTime)
@@ -88,6 +104,10 @@ namespace HealthConnect.Repositories
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.User)
                 .Include(a => a.Slot)
+                .Include(a => a.Vitals)
+                .Include(a => a.Medications)
+                .Include(a => a.Invoice)
+                .Include(a => a.Diagnosis)
                 .Where(a => a.DoctorId == doctorId)
                 .OrderByDescending(a => a.AppointmentDate)
                 .ThenBy(a => a.StartTime)
@@ -130,38 +150,48 @@ namespace HealthConnect.Repositories
 
         public async Task<Diagnosis> AddDiagnosisAsync(AddDiagnosisDto dto)
         {
-            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            // Load with navs so we can attach/update without severing required 1:1 relationship
+            var appointment = await _context.Appointments
+                .Include(a => a.Diagnosis)
+                .FirstOrDefaultAsync(a => a.Id == dto.AppointmentId);
+
             if (appointment == null)
                 throw new Exception("Appointment not found.");
 
-            var existingDiagnosis = await _context.Diagnoses.FirstOrDefaultAsync(d => d.AppointmentId == dto.AppointmentId);
-            if (existingDiagnosis != null)
+            // If a diagnosis already exists for this appointment, update it (1:1)
+            if (appointment.Diagnosis != null)
             {
-                // Update existing diagnosis
-                existingDiagnosis.DiagnosisDetails = dto.DiagnosisDetails;
-                existingDiagnosis.PatientId = dto.PatientId;
+                appointment.Diagnosis.DiagnosisDetails = dto.DiagnosisDetails;
+                appointment.Diagnosis.PatientId = dto.PatientId;
                 await _context.SaveChangesAsync();
-                return existingDiagnosis;
+                return appointment.Diagnosis;
             }
-            else
+
+            // Otherwise create new
+            var diagnosis = new Diagnosis
             {
-                // Create new diagnosis
-                var diagnosis = new Diagnosis
-                {
-                    Id = Guid.NewGuid(),
-                    AppointmentId = dto.AppointmentId,
-                    PatientId = dto.PatientId,
-                    DiagnosisDetails = dto.DiagnosisDetails
-                };
-                _context.Add(diagnosis);
-                await _context.SaveChangesAsync();
-                return diagnosis;
-            }
+                Id = Guid.NewGuid(),
+                AppointmentId = dto.AppointmentId,
+                PatientId = dto.PatientId,
+                DiagnosisDetails = dto.DiagnosisDetails
+            };
+
+            _context.Add(diagnosis);
+
+            // Attach to appointment (1:1)
+            appointment.Diagnosis = diagnosis;
+
+            await _context.SaveChangesAsync();
+            return diagnosis;
         }
 
         public async Task<Vitals> AddVitalsAsync(AddVitalsDto dto)
         {
-            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            // Load with nav so we can keep appointment in sync
+            var appointment = await _context.Appointments
+                .Include(a => a.Vitals)
+                .FirstOrDefaultAsync(a => a.Id == dto.AppointmentId);
+
             if (appointment == null)
                 throw new Exception("Appointment not found.");
 
@@ -173,6 +203,10 @@ namespace HealthConnect.Repositories
                 existingVitals.HeartRate = dto.HeartRate;
                 existingVitals.Temperature = dto.Temperature;
                 existingVitals.SpO2 = dto.SpO2;
+
+                // Keep navigation updated
+                appointment.Vitals = existingVitals;
+
                 await _context.SaveChangesAsync();
                 return existingVitals;
             }
@@ -189,7 +223,12 @@ namespace HealthConnect.Repositories
                     Temperature = dto.Temperature,
                     SpO2 = dto.SpO2
                 };
+
                 _context.Vitals.Add(vitals);
+
+                // Attach to appointment (1:1)
+                appointment.Vitals = vitals;
+
                 await _context.SaveChangesAsync();
                 return vitals;
             }
@@ -197,45 +236,43 @@ namespace HealthConnect.Repositories
 
         public async Task<Medications> AddMedicationsAsync(AddMedicationsDto dto)
         {
-            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            // Load with navs so we can attach the new medication to the appointment (1:many)
+            var appointment = await _context.Appointments
+                .Include(a => a.Medications)
+                .FirstOrDefaultAsync(a => a.Id == dto.AppointmentId);
+
             if (appointment == null)
                 throw new Exception("Appointment not found.");
 
-            var existingMedications = await _context.Medications.FirstOrDefaultAsync(m => m.AppointmentId == dto.AppointmentId);
-            if (existingMedications != null)
+            // Always create new medication entry (since Appointment can have multiple medications)
+            var medications = new Medications
             {
-                // Update existing
-                existingMedications.Drug = dto.Drug;
-                existingMedications.Dose = dto.Dose;
-                existingMedications.Route = dto.Route;
-                existingMedications.Frequency = dto.Frequency;
-                existingMedications.Activity = (HealthConnect.Models.Activity)dto.Activity;
-                await _context.SaveChangesAsync();
-                return existingMedications;
-            }
-            else
-            {
-                // Create new
-                var medications = new Medications
-                {
-                    Id = Guid.NewGuid(),
-                    AppointmentId = dto.AppointmentId,
-                    PatientId = dto.PatientId,
-                    Drug = dto.Drug,
-                    Dose = dto.Dose,
-                    Route = dto.Route,
-                    Frequency = dto.Frequency,
-                    Activity = (HealthConnect.Models.Activity)dto.Activity
-                };
-                _context.Medications.Add(medications);
-                await _context.SaveChangesAsync();
-                return medications;
-            }
+                Id = Guid.NewGuid(),
+                AppointmentId = dto.AppointmentId,
+                PatientId = dto.PatientId,
+                Drug = dto.Drug,
+                Dose = dto.Dose,
+                Route = dto.Route,
+                Frequency = dto.Frequency,
+                Activity = (HealthConnect.Models.Activity)dto.Activity
+            };
+
+            _context.Medications.Add(medications);
+
+            // Attach to appointment
+            appointment.Medications ??= new List<Medications>();
+            appointment.Medications.Add(medications);
+
+            await _context.SaveChangesAsync();
+            return medications;
         }
 
         public async Task<Invoice> AddInvoiceAsync(AddInvoiceDto dto)
         {
-            var appointment = await _context.Appointments.FindAsync(dto.AppointmentId);
+            var appointment = await _context.Appointments
+                .Include(a => a.Invoice)
+                .FirstOrDefaultAsync(a => a.Id == dto.AppointmentId);
+
             if (appointment == null)
                 throw new Exception("Appointment not found.");
 
@@ -248,6 +285,10 @@ namespace HealthConnect.Repositories
                 existingInvoice.LabFee = dto.LabFee;
                 existingInvoice.MedicineFee = dto.MedicineFee;
                 existingInvoice.Total = dto.Total;
+
+                // Keep navigation updated
+                appointment.Invoice = existingInvoice;
+
                 await _context.SaveChangesAsync();
                 return existingInvoice;
             }
@@ -264,10 +305,14 @@ namespace HealthConnect.Repositories
                     LabFee = dto.LabFee,
                     MedicineFee = dto.MedicineFee,
                     Total = dto.Total,
-                    Status = "Pending", // Set default status
+                    Status = InvoiceStatus.Pending, // Set default status
                     IssuedDate = DateTime.UtcNow // Set issued date
                 };
                 _context.Invoices.Add(invoice);
+
+                // Attach to appointment (1:1)
+                appointment.Invoice = invoice;
+
                 await _context.SaveChangesAsync();
                 return invoice;
             }

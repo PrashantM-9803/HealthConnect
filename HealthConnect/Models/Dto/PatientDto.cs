@@ -18,10 +18,7 @@ namespace HealthConnect.Models.Dto
         public UserDto User { get; set; }
         public DoctorDto Doctor { get; set; }
         public List<AppointmentDto> Appointments { get; set; }
-        public List<VitalsDto> Vitals { get; set; }
-        public List<MedicationsDto> Medications { get; set; }
-        public List<InvoiceDto> Invoices { get; set; }
-        public List<DiagnosisDto> Diagnoses { get; set; }
+       
     }   
 
     public class VitalsDto
@@ -68,7 +65,12 @@ namespace HealthConnect.Models.Dto
         public TimeSpan EndTime { get; set; }
         public int Status { get; set; }
         public string Reason { get; set; }
-        public string PatientName { get; set; } // Add this property
+
+        // Navigation properties
+        public VitalsDto Vitals { get; set; }
+        public List<MedicationsDto> Medications { get; set; }
+        public InvoiceDto Invoice { get; set; }
+        public DiagnosisDto Diagnosis { get; set; }
     }
 
 
@@ -91,10 +93,11 @@ namespace HealthConnect.Models.Dto
         public Guid AppointmentId { get; set; }
         public Guid PatientId { get; set; }
         public DateTime IssuedDate { get; set; }
-        public string Status { get; set; }
+        public InvoiceStatus Status { get; set; }
         public string ConsultationType { get; set; }
         public int ConsulationFee { get; set; }
         public int LabFee { get; set; }
+        public int MedicineFee { get; set; }
         public int Total { get; set; }
         public int? Outstanding { get; set; }
     }

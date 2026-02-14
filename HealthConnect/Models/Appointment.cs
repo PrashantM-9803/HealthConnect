@@ -19,7 +19,7 @@ namespace HealthConnect.Models
         public Patient Patient { get; set; }
         public DoctorSlot Slot { get; set; }
         public Invoice Invoice { get; set; }
-        public Medications Medications { get; set; }
+        public List<Medications> Medications { get; set; }
         public Vitals Vitals { get; set; }
         public Diagnosis Diagnosis { get; set; }
     }

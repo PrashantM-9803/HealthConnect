@@ -6,7 +6,7 @@
         public Guid AppointmentId { get; set; }
         public Guid PatientId { get; set; }
         public DateTime IssuedDate { get; set; }
-        public string Status { get; set; }
+        public InvoiceStatus Status { get; set; }
 
         public string ConsultationType { get; set; }
         public int ConsulationFee { get; set; }
@@ -24,5 +24,11 @@
         // Navigation Property
         public Appointment Appointment { get; set; }
         public Patient Patient { get; set; }
+    }
+
+    public enum InvoiceStatus
+    {
+        Pending = 0,
+        Paid = 1
     }
 }

@@ -60,11 +60,60 @@ namespace HealthConnect.Data
                 .HasForeignKey<Appointment>(a => a.SlotId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Prevent cascade delete from Appointment to Diagnosis
+            // Prevent cascade delete from Appointment to Diagnosis (one-to-one)
             builder.Entity<Diagnosis>()
                 .HasOne(d => d.Appointment)
                 .WithOne(a => a.Diagnosis)
                 .HasForeignKey<Diagnosis>(d => d.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Appointment to Vitals relationship (one-to-one)
+            builder.Entity<Vitals>()
+                .HasOne(v => v.Appointment)
+                .WithOne(a => a.Vitals)
+                .HasForeignKey<Vitals>(v => v.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Appointment to Medications relationship (one-to-many)
+            builder.Entity<Medications>()
+                .HasOne(m => m.Appointment)
+                .WithMany(a => a.Medications)
+                .HasForeignKey(m => m.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Appointment to Invoice relationship (one-to-one)
+            builder.Entity<Invoice>()
+                .HasOne(i => i.Appointment)
+                .WithOne(a => a.Invoice)
+                .HasForeignKey<Invoice>(i => i.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent cascade delete from Patient to Vitals
+            builder.Entity<Vitals>()
+                .HasOne(v => v.Patient)
+                .WithMany()
+                .HasForeignKey(v => v.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent cascade delete from Patient to Medications
+            builder.Entity<Medications>()
+                .HasOne(m => m.Patient)
+                .WithMany()
+                .HasForeignKey(m => m.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent cascade delete from Patient to Diagnosis
+            builder.Entity<Diagnosis>()
+                .HasOne(d => d.Patient)
+                .WithMany()
+                .HasForeignKey(d => d.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent cascade delete from Patient to Invoice
+            builder.Entity<Invoice>()
+                .HasOne(i => i.Patient)
+                .WithMany()
+                .HasForeignKey(i => i.PatientId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

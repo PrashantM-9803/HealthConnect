@@ -36,7 +36,7 @@ namespace HealthConnect.Controllers
 
         // GET: api/admin/doctors
         [HttpGet("doctors")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "PATIENT,ADMIN")]
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _doctorRepository.GetAllDoctorsAsync();
@@ -87,8 +87,65 @@ namespace HealthConnect.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetTotalAppointments()
         {
-            var totalAppointments = await _adminRepository.GetTotalAppointmentsAsync();
-            return Ok(new TotalAppointmentsDto { TotalAppointments = totalAppointments });
+            var (totalAppointments, todaysAppointments) = await _adminRepository.GetTotalAppointmentsAsync();
+            return Ok(new 
+            { 
+                totalAppointments = totalAppointments,
+                todaysAppointments = todaysAppointments
+            });
+        }
+
+        // GET: api/admin/invoices/pending
+        [HttpGet("invoices/pending")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetPendingInvoices()
+        {
+            var invoices = await _adminRepository.GetPendingInvoicesAsync();
+            var invoiceDtos = _mapper.Map<List<HealthConnect.Models.Dto.InvoiceDto>>(invoices);
+            return Ok(new
+            {
+                totalCount = invoiceDtos.Count,
+                invoices = invoiceDtos
+            });
+        }
+
+        // GET: api/admin/invoices/paid/total-amount
+        [HttpGet("invoices/paid/total-amount")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetTotalPaidInvoicesAmount()
+        {
+            var (totalAmount, todaysAmount) = await _adminRepository.GetTotalPaidInvoicesAmountAsync();
+            return Ok(new
+            {
+                totalAmount = totalAmount,
+                todaysAmount = todaysAmount
+            });
+        }
+
+        // GET: api/admin/invoices
+        [HttpGet("invoices")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetAllInvoices()
+        {
+            var invoices = await _adminRepository.GetAllInvoicesAsync();
+            var invoiceDtos = _mapper.Map<List<HealthConnect.Models.Dto.InvoiceDto>>(invoices);
+            return Ok(new
+            {
+                totalCount = invoiceDtos.Count,
+                invoices = invoiceDtos
+            });
+        }
+
+        // PUT: api/admin/invoices/{invoiceId}/mark-paid
+        [HttpPut("invoices/mark-paid/{invoiceId}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> MarkInvoiceAsPaid(Guid invoiceId)
+        {
+            var result = await _adminRepository.MarkInvoiceAsPaidAsync(invoiceId);
+            if (!result)
+                return NotFound(new { message = "Invoice not found or already paid." });
+
+            return Ok(new { message = "Invoice marked as paid successfully." });
         }
 
         // DELETE: api/admin/patients/{userId}
@@ -116,7 +173,7 @@ namespace HealthConnect.Controllers
         // PUT: api/admin/users/password/{userId}
         [HttpPut("users/password/{userId}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateUserPassword([FromBody] UpdatePasswordDto dto, Guid userId)
+        public async Task<IActionResult> UpdateUserPassword(Guid userId, [FromBody] AdminUpdatePasswordDto dto)
         {
             var result = await _adminRepository.UpdateUserPasswordAsync(userId, dto.NewPassword);
             if (!result)

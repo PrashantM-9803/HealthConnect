@@ -130,9 +130,70 @@ namespace HealthConnect.Repositories
             return await _context.Doctors.CountAsync();
         }
 
-        public async Task<int> GetTotalAppointmentsAsync()
+        public async Task<(int totalAppointments, int todaysAppointments)> GetTotalAppointmentsAsync()
         {
-            return await _context.Appointments.CountAsync();
+            var totalAppointments = await _context.Appointments.CountAsync();
+            
+            var today = DateTime.Today;
+            var todaysAppointments = await _context.Appointments
+                .Where(a => a.AppointmentDate.Date == today)
+                .CountAsync();
+            
+            return (totalAppointments, todaysAppointments);
+        }
+
+        public async Task<List<Invoice>> GetPendingInvoicesAsync()
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(i => i.Appointment)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                .Where(i => i.Status == InvoiceStatus.Pending)
+                .OrderByDescending(i => i.IssuedDate)
+                .ToListAsync();
+        }
+
+        public async Task<(int totalAmount, int todaysAmount)> GetTotalPaidInvoicesAmountAsync()
+        {
+            var totalAmount = await _context.Invoices
+                .Where(i => i.Status == InvoiceStatus.Paid)
+                .SumAsync(i => i.Total);
+            
+            var today = DateTime.Today;
+            var todaysAmount = await _context.Invoices
+                .Where(i => i.Status == InvoiceStatus.Paid && i.IssuedDate.Date == today)
+                .SumAsync(i => (int?)i.Total) ?? 0;
+            
+            return (totalAmount, todaysAmount);
+        }
+
+        public async Task<List<Invoice>> GetAllInvoicesAsync()
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(i => i.Appointment)
+                    .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                .OrderByDescending(i => i.IssuedDate)
+                .ToListAsync();
+        }
+
+        public async Task<bool> MarkInvoiceAsPaidAsync(Guid invoiceId)
+        {
+            var invoice = await _context.Invoices.FindAsync(invoiceId);
+            if (invoice == null)
+                return false;
+
+            // Only update if the invoice is currently pending
+            if (invoice.Status != InvoiceStatus.Pending)
+                return false;
+
+            invoice.Status = InvoiceStatus.Paid;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
