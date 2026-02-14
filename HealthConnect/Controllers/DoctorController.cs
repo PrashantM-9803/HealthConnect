@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using HealthConnect.Models; // Add this to resolve AppointmentStatus enum
 
 namespace HealthConnect.Controllers
 {

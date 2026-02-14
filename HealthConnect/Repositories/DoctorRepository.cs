@@ -79,10 +79,9 @@ namespace HealthConnect.Repositories
                 return false;
 
             doctor.User.Name = updateDto.Name;
-           
+            doctor.Specialization = updateDto.Specialization; // Set specialization
             doctor.YearsOfExperience = updateDto.YearsOfExperience;
             doctor.Bio = updateDto.Bio;
-           
             doctor.User.PhoneNumber = updateDto.PhoneNumber;
             // doctor.BID = updateDto.BID; // Add this if BID exists in Doctor model
             await _context.SaveChangesAsync();
@@ -101,6 +100,10 @@ namespace HealthConnect.Repositories
             return await _context.Patients
                 .Where(p => patientIds.Contains(p.Id))
                 .Include(p => p.User)
+                .Include(p => p.Vitals)
+                .Include(p => p.Medications)
+                .Include(p => p.Invoices)
+                .Include(p => p.Diagnoses)
                 .ToListAsync();
         }
     }
