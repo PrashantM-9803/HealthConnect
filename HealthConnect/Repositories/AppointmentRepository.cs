@@ -305,7 +305,7 @@ namespace HealthConnect.Repositories
                     LabFee = dto.LabFee,
                     MedicineFee = dto.MedicineFee,
                     Total = dto.Total,
-                    Status = "Pending", // Set default status
+                    Status = InvoiceStatus.Pending, // Set default status
                     IssuedDate = DateTime.UtcNow // Set issued date
                 };
                 _context.Invoices.Add(invoice);

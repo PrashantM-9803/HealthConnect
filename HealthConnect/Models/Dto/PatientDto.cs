@@ -93,10 +93,11 @@ namespace HealthConnect.Models.Dto
         public Guid AppointmentId { get; set; }
         public Guid PatientId { get; set; }
         public DateTime IssuedDate { get; set; }
-        public string Status { get; set; }
+        public InvoiceStatus Status { get; set; }
         public string ConsultationType { get; set; }
         public int ConsulationFee { get; set; }
         public int LabFee { get; set; }
+        public int MedicineFee { get; set; }
         public int Total { get; set; }
         public int? Outstanding { get; set; }
     }
