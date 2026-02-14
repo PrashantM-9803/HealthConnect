@@ -13,7 +13,9 @@ namespace HealthConnect.Mapping
                 .ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Doctor, DoctorDto>().ReverseMap();
-            CreateMap<Appointment, AppointmentDto>().ReverseMap();
+            CreateMap<Appointment, AppointmentDto>()
+                .ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient != null && src.Patient.User != null ? src.Patient.User.Name : null))
+                .ReverseMap();
             CreateMap<Vitals, VitalsDto>().ReverseMap();
             CreateMap<Medications, MedicationsDto>().ReverseMap();
             CreateMap<Invoice, InvoiceDto>().ReverseMap();
