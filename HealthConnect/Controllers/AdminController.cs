@@ -82,6 +82,15 @@ namespace HealthConnect.Controllers
             return Ok(new TotalDoctorsDto { TotalDoctors = totalDoctors });
         }
 
+        // GET: api/admin/doctors/workload
+        [HttpGet("doctors/workload")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetDoctorWorkload()
+        {
+            var workloadData = await _adminRepository.GetDoctorWorkloadAsync();
+            return Ok(workloadData);
+        }
+
         // GET: api/admin/appointments/total
         [HttpGet("appointments/total")]
         [Authorize(Roles = "ADMIN")]

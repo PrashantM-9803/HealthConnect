@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HealthConnect.Models;
+using HealthConnect.Models.Dto;
 
 namespace HealthConnect.Repositories
 {
@@ -19,5 +20,6 @@ namespace HealthConnect.Repositories
         Task<(int totalAmount, int todaysAmount)> GetTotalPaidInvoicesAmountAsync();
         Task<List<Invoice>> GetAllInvoicesAsync();
         Task<bool> MarkInvoiceAsPaidAsync(Guid invoiceId);
+        Task<DoctorWorkloadResponseDto> GetDoctorWorkloadAsync();
     }
 }
