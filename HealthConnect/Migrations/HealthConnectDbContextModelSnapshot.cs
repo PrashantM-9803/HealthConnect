@@ -88,7 +88,7 @@ namespace HealthConnect.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Diagnosis");
+                    b.ToTable("Diagnoses");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.Doctor", b =>

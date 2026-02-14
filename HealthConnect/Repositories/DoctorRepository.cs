@@ -100,6 +100,10 @@ namespace HealthConnect.Repositories
             return await _context.Patients
                 .Where(p => patientIds.Contains(p.Id))
                 .Include(p => p.User)
+                .Include(p => p.Vitals)
+                .Include(p => p.Medications)
+                .Include(p => p.Invoices)
+                .Include(p => p.Diagnoses)
                 .ToListAsync();
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using HealthConnect.Models; // Add this to resolve AppointmentStatus enum
 
 namespace HealthConnect.Controllers
 {
@@ -156,6 +157,20 @@ namespace HealthConnect.Controllers
                 totalPatients = patientDtos.Count(),
                 patients = patientDtos
             });
+        }
+
+        [HttpPut("appointments/status/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> UpdateAppointmentStatus(Guid appointmentId, [FromBody] string status)
+        {
+            if (!Enum.TryParse<AppointmentStatus>(status, true, out var appointmentStatus))
+                return BadRequest(new { message = "Invalid status. Use 'Completed' or 'Cancelled'." });
+
+            var result = await _appointmentRepository.UpdateAppointmentStatusAsync(appointmentId, appointmentStatus);
+            if (!result)
+                return NotFound(new { message = "Appointment not found." });
+
+            return Ok(new { message = $"Appointment status updated to {appointmentStatus}." });
         }
     }
 }

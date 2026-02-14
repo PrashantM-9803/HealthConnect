@@ -134,16 +134,29 @@ namespace HealthConnect.Repositories
             if (appointment == null)
                 throw new Exception("Appointment not found.");
 
-            var diagnosis = new Diagnosis
+            var existingDiagnosis = await _context.Diagnoses.FirstOrDefaultAsync(d => d.AppointmentId == dto.AppointmentId);
+            if (existingDiagnosis != null)
             {
-                Id = Guid.NewGuid(),
-                AppointmentId = dto.AppointmentId,
-                PatientId = dto.PatientId,
-                DiagnosisDetails = dto.DiagnosisDetails
-            };
-            _context.Add(diagnosis);
-            await _context.SaveChangesAsync();
-            return diagnosis;
+                // Update existing diagnosis
+                existingDiagnosis.DiagnosisDetails = dto.DiagnosisDetails;
+                existingDiagnosis.PatientId = dto.PatientId;
+                await _context.SaveChangesAsync();
+                return existingDiagnosis;
+            }
+            else
+            {
+                // Create new diagnosis
+                var diagnosis = new Diagnosis
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = dto.AppointmentId,
+                    PatientId = dto.PatientId,
+                    DiagnosisDetails = dto.DiagnosisDetails
+                };
+                _context.Add(diagnosis);
+                await _context.SaveChangesAsync();
+                return diagnosis;
+            }
         }
 
         public async Task<Vitals> AddVitalsAsync(AddVitalsDto dto)
