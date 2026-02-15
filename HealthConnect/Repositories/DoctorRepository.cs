@@ -104,7 +104,20 @@ namespace HealthConnect.Repositories
                 .Include(p => p.Medications)
                 .Include(p => p.Invoices)
                 .Include(p => p.Diagnoses)
+                .Include(p => p.Appointments.Where(a => a.Status == AppointmentStatus.Completed))
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(p => p.Appointments.Where(a => a.Status == AppointmentStatus.Completed))
+                    .ThenInclude(a => a.Vitals)
+                .Include(p => p.Appointments.Where(a => a.Status == AppointmentStatus.Completed))
+                    .ThenInclude(a => a.Medications)
                 .ToListAsync();
+        }
+
+        public async Task<Patient> GetPatientByIdAsync(Guid patientId)
+        {
+            return await _context.Patients
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
         }
     }
 }

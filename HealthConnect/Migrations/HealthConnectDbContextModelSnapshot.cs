@@ -81,12 +81,17 @@ namespace HealthConnect.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PatientId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId")
                         .IsUnique();
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PatientId1");
 
                     b.ToTable("Diagnoses");
                 });
@@ -190,6 +195,9 @@ namespace HealthConnect.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PatientId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -202,6 +210,8 @@ namespace HealthConnect.Migrations
                         .IsUnique();
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PatientId1");
 
                     b.ToTable("Invoices");
                 });
@@ -233,6 +243,9 @@ namespace HealthConnect.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PatientId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Route")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -242,6 +255,8 @@ namespace HealthConnect.Migrations
                     b.HasIndex("AppointmentId");
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PatientId1");
 
                     b.ToTable("Medications");
                 });
@@ -376,6 +391,9 @@ namespace HealthConnect.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PatientId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("SpO2")
                         .HasColumnType("int");
 
@@ -388,6 +406,8 @@ namespace HealthConnect.Migrations
                         .IsUnique();
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PatientId1");
 
                     b.ToTable("Vitals");
                 });
@@ -564,6 +584,10 @@ namespace HealthConnect.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HealthConnect.Models.Patient", null)
+                        .WithMany("Diagnoses")
+                        .HasForeignKey("PatientId1");
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Patient");
@@ -605,6 +629,10 @@ namespace HealthConnect.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HealthConnect.Models.Patient", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("PatientId1");
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Patient");
@@ -623,6 +651,10 @@ namespace HealthConnect.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("HealthConnect.Models.Patient", null)
+                        .WithMany("Medications")
+                        .HasForeignKey("PatientId1");
 
                     b.Navigation("Appointment");
 
@@ -660,6 +692,10 @@ namespace HealthConnect.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("HealthConnect.Models.Patient", null)
+                        .WithMany("Vitals")
+                        .HasForeignKey("PatientId1");
 
                     b.Navigation("Appointment");
 
@@ -748,6 +784,14 @@ namespace HealthConnect.Migrations
             modelBuilder.Entity("HealthConnect.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("Diagnoses");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Medications");
+
+                    b.Navigation("Vitals");
                 });
 
             modelBuilder.Entity("HealthConnect.Models.User", b =>

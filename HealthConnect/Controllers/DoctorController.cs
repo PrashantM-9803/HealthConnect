@@ -177,6 +177,44 @@ namespace HealthConnect.Controllers
 
             return Ok(new { message = "Appointment marked as completed.", appointmentId });
         }
+
+        [HttpGet("invoice/details/{invoiceId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> GetInvoiceDetails(Guid invoiceId)
+        {
+            var invoice = await _appointmentRepository.GetInvoiceByIdAsync(invoiceId);
+            if (invoice == null)
+                return NotFound(new { message = "Invoice not found." });
+
+            var patient = await _doctorRepository.GetPatientByIdAsync(invoice.PatientId);
+            var patientName = patient?.User?.Name ?? "";
+
+            return Ok(new {
+                invoiceId = invoice.Id.ToString().ToUpper(),
+                patientName = patientName,
+                amount = invoice.Total,
+                status = invoice.Status,
+                paidDate = invoice.Status == InvoiceStatus.Paid ? invoice.IssuedDate : (DateTime?)null,
+                consultationType = invoice.ConsultationType,
+                consultationFee = invoice.ConsulationFee,
+                labFee = invoice.LabFee,
+                medicineFee = invoice.MedicineFee,
+                otherCharges = 0, // Not present in AddInvoiceDto, set to 0
+                subtotal = invoice.Total
+            });
+        }
+
+        [HttpGet("appointments/today")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> GetTodayAppointments()
+        {
+            var appointments = await _appointmentRepository.GetTodayAppointmentsAsync();
+            var appointmentDtos = _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
+            return Ok(new {
+                totalAppointments = appointmentDtos.Count(),
+                appointments = appointmentDtos
+            });
+        }
     }
 }
 

@@ -17,6 +17,9 @@ namespace HealthConnect.Models
         public User User { get; set; }
         public Doctor Doctor { get; set; }
         public List<Appointment> Appointments { get; set; } = new();
-       
+        public List<Vitals> Vitals { get; set; } = new();
+        public List<Medications> Medications { get; set; } = new();
+        public List<Invoice> Invoices { get; set; } = new();
+        public List<Diagnosis> Diagnoses { get; set; } = new();
     }
 }

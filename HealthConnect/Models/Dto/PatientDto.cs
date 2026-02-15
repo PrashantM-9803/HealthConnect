@@ -65,6 +65,7 @@ namespace HealthConnect.Models.Dto
         public TimeSpan EndTime { get; set; }
         public int Status { get; set; }
         public string Reason { get; set; }
+        public string PatientName { get; set; } // Added for mapping
 
         // Navigation properties
         public VitalsDto Vitals { get; set; }

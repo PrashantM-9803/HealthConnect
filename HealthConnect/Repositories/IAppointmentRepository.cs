@@ -18,6 +18,8 @@ namespace HealthConnect.Repositories
         Task<Vitals> AddVitalsAsync(AddVitalsDto dto);
         Task<Medications> AddMedicationsAsync(AddMedicationsDto dto);
         Task<Invoice> AddInvoiceAsync(AddInvoiceDto dto);
+        Task<Invoice> GetInvoiceByIdAsync(Guid invoiceId);
+        Task<IEnumerable<Appointment>> GetTodayAppointmentsAsync();
     }
 }
 

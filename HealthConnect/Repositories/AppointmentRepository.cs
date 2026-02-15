@@ -317,6 +317,29 @@ namespace HealthConnect.Repositories
                 return invoice;
             }
         }
+
+        public async Task<Invoice> GetInvoiceByIdAsync(Guid invoiceId)
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
+        }
+
+        public async Task<IEnumerable<Appointment>> GetTodayAppointmentsAsync()
+        {
+            var today = DateTime.Today;
+            return await _context.Appointments
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(a => a.Slot)
+                .Where(a => a.AppointmentDate.Date == today)
+                .OrderByDescending(a => a.AppointmentDate)
+                .ThenBy(a => a.StartTime)
+                .ToListAsync();
+        }
     }
 }
 
