@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HealthConnect.Data;
 using HealthConnect.Models;
+using HealthConnect.Models.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -194,6 +195,60 @@ namespace HealthConnect.Repositories
             invoice.Status = InvoiceStatus.Paid;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<DoctorWorkloadResponseDto> GetDoctorWorkloadAsync()
+        {
+            var doctors = await _context.Doctors
+                .Include(d => d.User)
+                .Include(d => d.Appointments)
+                .ToListAsync();
+
+            var doctorWorkloads = new List<DoctorWorkloadDto>();
+
+            foreach (var doctor in doctors)
+            {
+                var totalAppointments = doctor.Appointments.Count;
+                var completedAppointments = doctor.Appointments.Count(a => a.Status == AppointmentStatus.Completed);
+                var pendingAppointments = doctor.Appointments.Count(a => a.Status == AppointmentStatus.Pending);
+                var cancelledAppointments = doctor.Appointments.Count(a => a.Status == AppointmentStatus.Cancelled);
+
+                // Calculate average appointments per day
+                var firstAppointmentDate = doctor.Appointments.OrderBy(a => a.AppointmentDate).FirstOrDefault()?.AppointmentDate;
+                var lastAppointmentDate = doctor.Appointments.OrderByDescending(a => a.AppointmentDate).FirstOrDefault()?.AppointmentDate;
+                
+                double averageAppointmentsPerDay = 0;
+                if (firstAppointmentDate.HasValue && lastAppointmentDate.HasValue && totalAppointments > 0)
+                {
+                    var daysDifference = (lastAppointmentDate.Value - firstAppointmentDate.Value).TotalDays;
+                    if (daysDifference > 0)
+                    {
+                        averageAppointmentsPerDay = Math.Round(totalAppointments / daysDifference, 2);
+                    }
+                    else
+                    {
+                        averageAppointmentsPerDay = totalAppointments; // All appointments on the same day
+                    }
+                }
+
+                doctorWorkloads.Add(new DoctorWorkloadDto
+                {
+                    DoctorId = doctor.Id,
+                    DoctorName = doctor.User?.Name ?? "Unknown Doctor",
+                    TotalAppointments = totalAppointments,
+                    CompletedAppointments = completedAppointments,
+                    PendingAppointments = pendingAppointments,
+                    CancelledAppointments = cancelledAppointments,
+                    AverageAppointmentsPerDay = averageAppointmentsPerDay,
+                    LastAppointmentDate = lastAppointmentDate
+                });
+            }
+
+            return new DoctorWorkloadResponseDto
+            {
+                Doctors = doctorWorkloads.OrderByDescending(d => d.TotalAppointments).ToList(),
+                TotalCount = doctorWorkloads.Count
+            };
         }
     }
 }
