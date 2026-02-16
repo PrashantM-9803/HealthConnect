@@ -340,6 +340,16 @@ namespace HealthConnect.Repositories
                 .ThenBy(a => a.StartTime)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Invoice>> GetInvoicesByDoctorIdAsync(Guid doctorId)
+        {
+            return await _context.Invoices
+                .Include(i => i.Patient)
+                    .ThenInclude(p => p.User)
+                .Include(i => i.Appointment)
+                .Where(i => i.Appointment.DoctorId == doctorId)
+                .ToListAsync();
+        }
     }
 }
 
