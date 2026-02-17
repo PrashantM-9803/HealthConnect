@@ -20,6 +20,7 @@ namespace HealthConnect.Repositories
         Task<Invoice> AddInvoiceAsync(AddInvoiceDto dto);
         Task<Invoice> GetInvoiceByIdAsync(Guid invoiceId);
         Task<IEnumerable<Appointment>> GetTodayAppointmentsAsync();
+        Task<IEnumerable<Invoice>> GetInvoicesByDoctorIdAsync(Guid doctorId);
     }
 }
 

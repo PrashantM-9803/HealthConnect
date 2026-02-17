@@ -147,7 +147,7 @@ namespace HealthConnect.Controllers
 
         // PUT: api/admin/invoices/{invoiceId}/mark-paid
         [HttpPut("invoices/mark-paid/{invoiceId}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,PATIENT")]
         public async Task<IActionResult> MarkInvoiceAsPaid(Guid invoiceId)
         {
             var result = await _adminRepository.MarkInvoiceAsPaidAsync(invoiceId);
