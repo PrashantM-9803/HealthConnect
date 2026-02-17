@@ -33,6 +33,7 @@ namespace HealthConnect.Repositories
             return await _context.Doctors
                 .Include(d => d.User)
                 .Include(d => d.Patients)
+                .ThenInclude(p => p.User)
                 .Include(d => d.Appointments)
                 
                 .FirstOrDefaultAsync(d => d.UserId == userId);
