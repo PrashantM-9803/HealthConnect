@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AutoMapper;
 using HealthConnect.Models;
 using HealthConnect.Models.Dto;
@@ -7,8 +5,7 @@ using HealthConnect.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
-using HealthConnect.Models; // Add this to resolve AppointmentStatus enum
+
 
 namespace HealthConnect.Controllers
 {
@@ -176,6 +173,30 @@ namespace HealthConnect.Controllers
                 return NotFound(new { message = "Appointment not found." });
 
             return Ok(new { message = "Appointment marked as completed.", appointmentId });
+        }
+
+        [HttpPut("appointments/cancel/{appointmentId}")]
+        [Authorize(Roles = "DOCTOR,ADMIN")]
+        public async Task<IActionResult> CancelAppointment(Guid appointmentId)
+        {
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+            if (appointment == null)
+                return NotFound(new { message = "Appointment not found." });
+
+            if (appointment.Status == AppointmentStatus.Cancelled)
+                return BadRequest(new { message = "Appointment is already cancelled." });
+
+            if (appointment.Status == AppointmentStatus.Completed)
+                return BadRequest(new { message = "Cannot cancel a completed appointment." });
+
+            if (appointment.Status != AppointmentStatus.Pending)
+                return BadRequest(new { message = $"Cannot cancel appointment with status: {appointment.Status}" });
+
+            var updated = await _appointmentRepository.UpdateAppointmentStatusAsync(appointmentId, AppointmentStatus.Cancelled);
+            if (!updated)
+                return NotFound(new { message = "Failed to update appointment status." });
+
+            return Ok(new { message = "Appointment cancelled successfully.", appointmentId });
         }
 
         [HttpGet("invoice/details/{invoiceId}")]

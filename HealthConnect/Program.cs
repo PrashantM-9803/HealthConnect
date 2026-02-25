@@ -1,5 +1,4 @@
 using System.Text;
-using AutoMapper;
 using HealthConnect.Data;
 using HealthConnect.Models;
 using HealthConnect.Repositories;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,7 +86,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-// Register TokenRepository
+// Register Repository interfaces
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -110,9 +109,7 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 
 // Register AutoMapper and scan for profiles
 builder.Services.AddAutoMapper(typeof(HealthConnect.Mapping.AuthProfile).Assembly);
